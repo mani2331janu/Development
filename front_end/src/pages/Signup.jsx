@@ -19,6 +19,8 @@ const Signup = () => {
     alert("Signup successful!");
   };
 
+  
+
   return (
     <div style={{ maxWidth: "400px", margin: "50px auto" }}>
       <h2>Signup</h2>
