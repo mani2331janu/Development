@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -18,6 +18,8 @@ const Login = () => {
         margin: "20px auto",
         padding: "20px",
     };
+
+    const [showPassword, seShowPassword] = useState(false)
 
     let navigate = useNavigate();
 
@@ -64,15 +66,27 @@ const Login = () => {
                     helperText={errors.email?.message}
                     error={!!errors.email}
                 />
-                <TextField
-                    label="Password"
-                    type="password"
-                    fullWidth
-                    margin="normal"
-                    {...register("password")}
-                    helperText={errors.password?.message}
-                    error={!!errors.password}
-                />
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+
+                    <TextField
+                        label="Password"
+                        type={showPassword ? "text" : "password"}
+                        fullWidth
+                        margin="normal"
+                        {...register("password")}
+                        helperText={errors.password?.message}
+                        error={!!errors.password}
+
+                    />
+                    <Button onClick={() => { seShowPassword(!showPassword) }}
+                        style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "1.2rem"
+                        }}
+                    > {showPassword ? "🙈" : "👁️"}</Button>
+                </div>
 
                 <Button
                     type="submit"
