@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import {
-  Typography,
-  TextField,
-  Button,
-  Paper
-} from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom";
+import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import axios from 'axios';
 
 const Signup = () => {
+  const api_url = import.meta.env.VITE_API_URL
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -19,125 +17,112 @@ const Signup = () => {
     name: Yup.string().required("Name is required"),
     email: Yup.string().required("Email is required"),
     password: Yup.string().required("Password is required"),
-    confirm_password: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm password is required"),
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: yupResolver(schema)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
   });
 
-  const handleSave = (data) => {
-    console.log(data);
-  };
+  let handleSave = async (data) => {
+    try {
+      const response = await axios.post(`${api_url}api/auth/sign_up`, data)
+      alert(response.data.message);
+      navigate("/login")
 
-  const paperStyle = {
-    width: 400,
-    margin: "20px auto",
-    padding: "20px",
-    display: "grid",
-    gap: "20px"
-  };
+    } catch (error) {
+      console.log(error);
+      alert(error.response?.data?.message || "Something Went Wrong")
+
+    }
+  }
 
   return (
-    <Paper
-      style={paperStyle}
-      elevation={3}
-      component="form"
-      onSubmit={handleSubmit(handleSave)}
-    >
-      <Typography variant="h4" align="center" fontWeight="bold" gutterBottom>
-        Sign Up
-      </Typography>
-
-      <TextField
-        label="Name"
-        fullWidth
-        margin="normal"
-        {...register("name")}
-        helperText={errors.name?.message}
-        error={!!errors.name}
-      />
-
-      <TextField
-        label="Email"
-        type="email"
-        fullWidth
-        margin="normal"
-        {...register("email")}
-        helperText={errors.email?.message}
-        error={!!errors.email}
-      />
-
-      {/* Password field with a simple toggle button outside */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <TextField
-          label="Password"
-          type={showPassword ? "text" : "password"}
-          fullWidth
-          margin="normal"
-          {...register("password")}
-          helperText={errors.password?.message}
-          error={!!errors.password}
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.2rem"
-          }}
-        >
-          {showPassword ? "🙈" : "👁️"}
-        </button>
+    <div className="min-h-screen flex">
+      {/* Left Side - Image */}
+      <div
+        className="hidden md:flex w-1/2 bg-cover bg-center"
+        style={{ backgroundImage: "url('https://source.unsplash.com/random/800x600')" }}
+      >
+        <div className="bg-black bg-opacity-30 w-full h-full flex items-center justify-center">
+          <h1 className="text-white text-4xl  font-bold">Join Us!</h1>
+        </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <TextField
-          label="Confirm Password"
-          type={showConfirm ? "text" : "password"}
-          fullWidth
-          margin="normal"
-          {...register("confirm_password")}
-          helperText={errors.confirm_password?.message}
-          error={!!errors.confirm_password}
-        />
-        <button
-          type="button"
-          onClick={() => setShowConfirm(!showConfirm)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.2rem"
-          }}
+      {/* Right Side - Form */}
+      <div className="flex w-full md:w-1/2 items-center justify-center bg-gray-100">
+        <form
+          onSubmit={handleSubmit(handleSave)}
+          className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md grid gap-5"
         >
-          {showConfirm ? "🙈" : "👁️"}
-        </button>
+          <h2 className="text-3xl font-bold text-center">Sign Up</h2>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Name</label>
+            <input
+              type="text"
+              {...register("name")}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.name ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Email</label>
+            <input
+              type="email"
+              {...register("email")}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="relative">
+            <label className="block text-gray-700 mb-2">Password</label>
+            <input
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-xl"
+            >
+              {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
+            </button>
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+          >
+            Create Account
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="w-full border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-100 transition"
+          >
+            Log In
+          </button>
+        </form>
       </div>
-
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        fullWidth
-        sx={{ mt: 2 }}
-        type="submit"
-      >
-        Create Account
-      </Button>
-
-      <Button
-        variant="outlined"
-        fullWidth
-        onClick={() => navigate("/login")}
-      >
-        Log In
-      </Button>
-    </Paper>
+    </div>
   );
 };
 

@@ -7,120 +7,116 @@ import {
   sidebarClasses,
 } from "react-pro-sidebar";
 import { NavLink, useLocation } from "react-router-dom";
+
 import {
-  Package,
-  LayoutDashboard,
-  CheckSquare,
-  List,
-  PlusSquare,
-} from "lucide-react";
-export default function AppSidebar() {
+  FaTachometerAlt,   
+  FaUsers,           
+  FaUpload,          
+  FaUserCheck,       
+  FaMapMarkerAlt,   
+  FaHotel,          
+  FaBuilding,        
+  FaBed,            
+  FaMinusSquare,
+  FaTimesCircle,
+} from "react-icons/fa";
+
+import "../../../App.css";
+
+export default function AppSidebar({ collapsed, isMobile, onToggle }) {
   const { pathname } = useLocation();
 
+  const colors = {
+    sidebarBg: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
+    text: "#ffffff",
+    hoverBg: "#ffffff",
+    hoverText: "#000000",
+    activeBg: "#000000",
+    activeText: "#ffffff",
+  };
+
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 z-40 pt-16">
+    <aside
+      className="fixed top-0 left-0 h-screen z-60 transition-all duration-300"
+      style={{ width: collapsed ? 80 : 250 }}
+    >
       <Sidebar
-        width="16rem"
+        collapsed={collapsed}
         backgroundColor="transparent"
         rootStyles={{
           [`.${sidebarClasses.container}`]: {
-            background: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
-            color: "white",
-            borderRight: "0",
+            background: colors.sidebarBg,
             height: "100vh",
+            borderRight: "0",
+            color: colors.text,
           },
         }}
       >
+        {/* Header / toggle */}
+        <div className="flex items-center justify-between px-4 py-3">
+          {!collapsed && !isMobile && (
+            <span className="font-bold text-lg ps-2 font-serif">My App</span>
+          )}
+          <button onClick={onToggle} className="text-white hover:text-gray-300">
+            {collapsed ? <FaMinusSquare size={22} /> : <FaTimesCircle size={22} />}
+          </button>
+        </div>
+
+        {/* Menu items */}
         <Menu
           menuItemStyles={{
-            button: ({ level, active }) => {
-              if (level === 0) {
-                return {
-                  borderRadius: 8,
-                  padding: "8px 12px",
-                  margin: "4px 12px",
-                  fontWeight: active ? 600 : 400,
-                  color: "white",
-                  backgroundColor: active ? "black" : "transparent",
-
-                  "&:hover": {
-                    backgroundColor: "white",
-                    color: "black",
-                  },
-
-                  "&.active": {
-                    backgroundColor: "black",
-                    color: "white",
-                    fontWeight: 700,
-                  },
-                };
-              }
-
-              return {
-                borderRadius: 6,
-                padding: "6px 10px",
-                margin: "4px 8px",
-                fontWeight: active ? 600 : 400,
-                color: "white",
-                backgroundColor: active ? "#333" : "transparent", 
-
-                "&:hover": {
-                  backgroundColor: "#444", 
-                  color: "white",
-                },
-
-                "&.active": {
-                  backgroundColor: "#333",
-                  color: "white",
-                  fontWeight: 700,
-                },
-              };
+            button: {
+              color: colors.text,
+              borderRadius: 8,
+              padding: "8px 12px",
+              margin: "4px 12px",
+              fontWeight: 500,
+              "&:hover": {
+                backgroundColor: colors.hoverBg,
+                color: colors.hoverText,
+              },
+              "&.active": {
+                backgroundColor: colors.activeBg,
+                color: colors.activeText,
+                fontWeight: 700,
+              },
             },
-
             subMenuContent: {
+              backgroundColor: "transparent",
               paddingLeft: 8,
-              borderLeft: "1px solid rgba(255,255,255,0.25)",
-              marginLeft: 12,
-              backgroundColor: "black",
-              color: "white",
-              borderRadius: "5px",
-              width: "227px",
             },
           }}
         >
           {/* Dashboard */}
-          <MenuItem
-            icon={<LayoutDashboard size={18} />}
-            component={<NavLink to="/" end />}
-          >
+          <MenuItem icon={<FaTachometerAlt />} component={<NavLink to="/" />}>
             Dashboard
           </MenuItem>
 
-          {/* Todo */}
-          {/* <MenuItem
-            icon={<CheckSquare size={18} />}
-            component={<NavLink to="todo" />}
-          >
-            Todo
-          </MenuItem> */}
+          {/* Administration */}
+          <SubMenu icon={<FaUsers />} label="Administration">
+            <MenuItem icon={<FaUpload />} component={<NavLink to="/administration/uploads/list" />}>
+              Upload Logs
+            </MenuItem>
+            <MenuItem icon={<FaUserCheck />} component={<NavLink to="/admin/master/hostellers/list" />}>
+              Hostellers
+            </MenuItem>
+          </SubMenu>
 
-          {/* <SubMenu
-            label="Product"
-            icon={<Package size={18} />}
-          >
-            <MenuItem
-              icon={<List size={16} />}
-              component={<NavLink to="product/list" />}
-            >
-              List
+          {/* Master */}
+          <SubMenu icon={<FaBuilding />} label="Master">
+            <MenuItem icon={<FaMapMarkerAlt />} component={<NavLink to="/master/location/list" />}>
+              Location
             </MenuItem>
-            <MenuItem
-              icon={<PlusSquare size={16} />}
-              component={<NavLink to="product/add" />}
-            >
-              Add New
+            <MenuItem icon={<FaHotel />} component={<NavLink to="/master/hostel/list" />}>
+              Hostel
             </MenuItem>
-          </SubMenu> */}
+            <MenuItem icon={<FaBuilding />} component={<NavLink to="/master/building/list" />}>
+              Building
+            </MenuItem>
+            <MenuItem icon={<FaBed />} component={<NavLink to="/master/room/list" />}>
+              Rooms
+            </MenuItem>
+          </SubMenu>
         </Menu>
       </Sidebar>
     </aside>

@@ -1,0 +1,9 @@
+.ps-submenu-content {
+  background: linear-gradient(180deg, #7c3aed 0%, #d946ef 100%) !important;
+  border-radius: 8px !important;
+  left: 12px !important;     
+}
+
+.ps-menu-button ps-open{
+    width: 30px;
+}
