@@ -7,6 +7,7 @@ import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import LoginImage from '../../assets/student_portal.jpg'; // make sure to include extension
 import axios from 'axios'
 import { useAuth } from "../../context/AuthContext";
+import { notifySuccess } from '../../utils/notify';
 
 const Login = () => {
   const api_url = import.meta.env.VITE_API_URL
@@ -33,10 +34,12 @@ const Login = () => {
       const res = await axios.post(`${api_url}api/auth/log_in`, data);
       // backend response has: { token, user: { id, name, email }, ... }
       login(res.data.token, res.data.user);
+      notifySuccess(res.data.message || "Login successfully!");
       navigate("/");
     } catch (err) {
       const message =
         err.response?.data?.message || "Login failed. Please try again.";
+
       setErrorMsg(message);
     }
   };

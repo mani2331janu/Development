@@ -1,39 +1,45 @@
 // AppSidebar.jsx
-import {
-  Sidebar,
-  Menu,
-  MenuItem,
-  SubMenu,
-  sidebarClasses,
-} from "react-pro-sidebar";
+import { Sidebar, Menu, MenuItem, SubMenu, sidebarClasses } from "react-pro-sidebar";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
-  FaTachometerAlt,   
-  FaUsers,           
-  FaUpload,          
-  FaUserCheck,       
-  FaMapMarkerAlt,   
-  FaHotel,          
-  FaBuilding,        
-  FaBed,            
+  FaTachometerAlt,
+  FaUsers,
+  FaUpload,
+  FaUserCheck,
+  FaMapMarkerAlt,
+  FaHotel,
+  FaBuilding,
+  FaBed,
   FaMinusSquare,
   FaTimesCircle,
 } from "react-icons/fa";
 
+import { useTheme } from "../../../context/ThemeContext";
 import "../../../App.css";
 
 export default function AppSidebar({ collapsed, isMobile, onToggle }) {
   const { pathname } = useLocation();
+  const { theme } = useTheme();
 
-  const colors = {
-    sidebarBg: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
-    text: "#ffffff",
-    hoverBg: "#ffffff",
-    hoverText: "#000000",
-    activeBg: "#000000",
-    activeText: "#ffffff",
-  };
+  // Define colors based on theme
+  const colors = theme === "dark"
+    ? {
+        sidebarBg: "#101828",
+        text: "white",
+        hoverBg: "#374151",
+        hoverText: "white",
+        activeBg: "#111827",
+        activeText: "#fbbf24",
+      }
+    : {
+        sidebarBg: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
+        text: "white",
+        hoverBg: "white",
+        hoverText: "black",
+        activeBg: "black",
+        activeText: "white",
+      };
 
   return (
     <aside
@@ -94,29 +100,21 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
 
           {/* Administration */}
           <SubMenu icon={<FaUsers />} label="Administration">
-            <MenuItem icon={<FaUpload />} component={<NavLink to="/administration/uploads/list" />}>
+            <MenuItem
+              icon={<FaUpload />}
+              component={<NavLink to="/administration/uploads/list" />}
+            >
               Upload Logs
             </MenuItem>
-            <MenuItem icon={<FaUserCheck />} component={<NavLink to="/admin/master/hostellers/list" />}>
+            <MenuItem
+              icon={<FaUserCheck />}
+              component={<NavLink to="/admin/master/hostellers/list" />}
+            >
               Hostellers
             </MenuItem>
           </SubMenu>
 
-          {/* Master */}
-          <SubMenu icon={<FaBuilding />} label="Master">
-            <MenuItem icon={<FaMapMarkerAlt />} component={<NavLink to="/master/location/list" />}>
-              Location
-            </MenuItem>
-            <MenuItem icon={<FaHotel />} component={<NavLink to="/master/hostel/list" />}>
-              Hostel
-            </MenuItem>
-            <MenuItem icon={<FaBuilding />} component={<NavLink to="/master/building/list" />}>
-              Building
-            </MenuItem>
-            <MenuItem icon={<FaBed />} component={<NavLink to="/master/room/list" />}>
-              Rooms
-            </MenuItem>
-          </SubMenu>
+          
         </Menu>
       </Sidebar>
     </aside>

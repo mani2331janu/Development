@@ -4,6 +4,20 @@
   left: 12px !important;     
 }
 
-.ps-menu-button ps-open{
-    width: 30px;
+.ps-menu-button ps-open {
+  width: 30px;
 }
+
+.dark .ps-submenu-content {
+  background: #1f2937 !important; 
+  border-radius: 8px !important;
+  left: 12px !important;     
+}
+
+.dark .ps-menu-button ps-open {
+  width: 30px;
+  background-color: #374151 !important; 
+  color: #fbbf24 !important; 
+  background: #dde0e4 !important;
+}
+

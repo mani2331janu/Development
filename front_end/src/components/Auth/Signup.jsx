@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import axios from 'axios';
+import { notifySuccess, notifyError } from '../../utils/notify';
 
 const Signup = () => {
   const api_url = import.meta.env.VITE_API_URL
@@ -27,18 +28,15 @@ const Signup = () => {
     resolver: yupResolver(schema),
   });
 
-  let handleSave = async (data) => {
+  const handleSave = async (data) => {
     try {
-      const response = await axios.post(`${api_url}api/auth/sign_up`, data)
-      alert(response.data.message);
-      navigate("/login")
-
+      const res = await axios.post(`${api_url}api/auth/sign_up`, data);
+      notifySuccess(res.data.message || "Registered successfully!");
+      navigate("/login");
     } catch (error) {
-      console.log(error);
-      alert(error.response?.data?.message || "Something Went Wrong")
-
+      notifyError(error.response?.data?.message || "Something went wrong!");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex">
