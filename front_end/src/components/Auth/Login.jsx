@@ -31,16 +31,16 @@ const Login = () => {
   const handleCheck = async (data) => {
     try {
       const res = await axios.post(`${api_url}api/auth/log_in`, data);
-
-      login(res.data.token);
+      // backend response has: { token, user: { id, name, email }, ... }
+      login(res.data.token, res.data.user);
       navigate("/");
-
     } catch (err) {
       const message =
         err.response?.data?.message || "Login failed. Please try again.";
       setErrorMsg(message);
     }
   };
+
 
 
   const handleNavigate = () => {

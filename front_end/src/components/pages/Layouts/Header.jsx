@@ -1,13 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { useContext, useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Menu as MenuIcon } from "lucide-react";
-import { useAuth } from "../../../context/AuthContext"
+import { useAuth } from "../../../context/AuthContext";
 
 const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
+  
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
-  const { logout } = useAuth();        
+  const { logout, user } = useAuth();   // <-- get user
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -20,8 +21,8 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
   }, []);
 
   const handleLogout = () => {
-    logout();              
-    navigate("/login", { replace: true }); 
+    logout();
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -29,7 +30,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
       style={{ left: sidebarWidth }}
       className="fixed top-0 right-0 h-16 bg-white/70 backdrop-blur-md border-b border-white/20 z-50 flex items-center justify-between px-6 font-semibold"
     >
-      {/* Left side: App name & mobile toggle */}
+      {/* Left side */}
       <div className="flex items-center gap-4">
         <button
           className="md:hidden p-2 rounded hover:bg-gray-200"
@@ -41,7 +42,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
         <span>My Application</span>
       </div>
 
-      {/* Right side: Profile avatar + dropdown */}
+      {/* Right side */}
       <div
         className="relative bg-white w-44 shadow-lg ring-1 ring-gray-200 rounded-md"
         ref={dropdownRef}
@@ -51,9 +52,11 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
           className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-100"
         >
           <div className="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
-            {/* You can put first letter of user name here */}
+            {user?.name?.[0]?.toUpperCase()}
           </div>
-          {/* <span className="hidden sm:inline text-gray-700">{userName}</span> */}
+          <span className="hidden sm:inline text-gray-700">
+            {user?.name}
+          </span>
         </button>
 
         {open && (
@@ -61,9 +64,6 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
             <ul className="py-2 text-sm text-gray-700">
               <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                 Profile
-              </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                Settings
               </li>
               <li
                 onClick={handleLogout}
