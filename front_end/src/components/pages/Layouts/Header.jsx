@@ -44,8 +44,8 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
         >
           <MenuIcon size={20} />
         </button>
-        <span className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
-          My Application
+        <span className="text-xl font-bold text-gray-800 dark:text-gray-200 transition-colors duration-300">
+          Student Management Portal
         </span>
       </div>
 
@@ -63,9 +63,9 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 px-3 py-1 bg-red-100 rounded hover:bg-gray-100  dark:hover:bg-gray-700 dark:bg-green-200  transition-colors duration-300"
+            className="flex items-center gap-2 px-3 py-1 bg-red-100 rounded hover:bg-gray-100   dark:bg-green-100  transition-colors duration-300"
           >
-            <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-indigo-300 flex items-center justify-center text-white font-bold">
+            <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-white-100 flex items-center justify-center text-white font-bold">
               {user?.name?.[0]?.toUpperCase()}
             </div>
             <span className="hidden sm:inline text-gray-700 dark:text-black transition-colors duration-300">

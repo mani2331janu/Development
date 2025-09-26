@@ -20,7 +20,7 @@ const Login = () => {
   const schema = Yup.object().shape({
     email: Yup.string()
       .required("Email is Required")
-      .matches(/^[a-z]+@[a-z]{3,5}\.[a-z]{2,4}$/, "Enter Valid Email"),
+      .matches(/^[a-zA-Z0-9._]+@[a-zA-Z0-9.-]{3,15}\.[a-zA-Z]{2,4}$/, "Enter Valid Email"),
     password: Yup.string().required("Enter a Password"),
   });
 

@@ -12,6 +12,8 @@ import Dashboard from "./components/Auth/Dashboard";
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
 import Profile from "./components/Profile/Profile";
+import LocationList from "./components/pages/Master/Location/LocationList";
+import LocationAdd from "./components/pages/Master/Location/LocationAdd";
 
 export default function App() {
   return (
@@ -25,7 +27,7 @@ export default function App() {
             newestOnTop
             closeOnClick
             pauseOnHover
-            theme="colored" 
+            theme="colored"
           />
 
           <Routes>
@@ -54,7 +56,16 @@ export default function App() {
               }
             >
               <Route index element={<Dashboard />} />
-              <Route path="profile" element={<Profile/>}/>
+              <Route path="profile" element={<Profile />} />
+
+              {/* master location */}
+              <Route path="master">
+                <Route path="location">
+                  <Route path="list" element={<LocationList />} />
+                  <Route path="add" element={<LocationAdd />} />
+                </Route>
+              </Route>
+
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

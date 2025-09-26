@@ -10,10 +10,11 @@ import {
   FaMapMarkerAlt,
   FaHotel,
   FaBuilding,
-  FaBed,
+  FaCogs ,
   FaMinusSquare,
   FaTimesCircle,
 } from "react-icons/fa";
+import { GrMapLocation } from "react-icons/gr";
 
 import { useTheme } from "../../../context/ThemeContext";
 import "../../../App.css";
@@ -93,25 +94,18 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
             },
           }}
         >
-          {/* Dashboard */}
           <MenuItem icon={<FaTachometerAlt />} component={<NavLink to="/" />}>
             Dashboard
           </MenuItem>
 
-          {/* Administration */}
-          <SubMenu icon={<FaUsers />} label="Administration">
+          <SubMenu icon={<FaCogs  />} label="Master">
             <MenuItem
-              icon={<FaUpload />}
-              component={<NavLink to="/administration/uploads/list" />}
+              icon={<GrMapLocation />}
+              component={<NavLink to="master/location/list" />}
             >
-              Upload Logs
+              Location Master
             </MenuItem>
-            <MenuItem
-              icon={<FaUserCheck />}
-              component={<NavLink to="/admin/master/hostellers/list" />}
-            >
-              Hostellers
-            </MenuItem>
+           
           </SubMenu>
 
           
