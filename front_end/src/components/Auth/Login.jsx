@@ -32,7 +32,6 @@ const Login = () => {
   const handleCheck = async (data) => {
     try {
       const res = await axios.post(`${api_url}api/auth/log_in`, data);
-      // backend response has: { token, user: { id, name, email }, ... }
       login(res.data.token, res.data.user);
       notifySuccess(res.data.message || "Login successfully!");
       navigate("/");

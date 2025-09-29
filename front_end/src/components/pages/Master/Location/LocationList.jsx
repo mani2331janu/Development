@@ -10,7 +10,7 @@ const LocationList = () => {
   const getAllList = async () => {
     try {
       const res = await api.get(`${api_url}api/master/location/list`);
-      setLocations(res.data);  // ✅ store array of locations
+      setLocations(res.data);  
     } catch (err) {
       console.error("Failed to fetch locations:", err);
     }
@@ -52,7 +52,7 @@ const LocationList = () => {
                 <td className="px-4 py-2 border text-center">{index + 1}</td>
                 <td className="px-4 py-2 border">{loc.location_name}</td>
                 <td className="px-4 py-2 border text-center">
-                  <button className="text-blue-600 hover:underline">
+                  <button onClick={()=>{navigate(`/master/location/edit/${loc._id}`)}} className="text-blue-600 hover:underline">
                     Edit
                   </button>
                 </td>

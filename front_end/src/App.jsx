@@ -14,6 +14,7 @@ import PublicRoute from "./routes/PublicRoute";
 import Profile from "./components/Profile/Profile";
 import LocationList from "./components/pages/Master/Location/LocationList";
 import LocationAdd from "./components/pages/Master/Location/LocationAdd";
+import LocationEdit from "./components/pages/Master/Location/LocationEdit";
 
 export default function App() {
   return (
@@ -63,6 +64,8 @@ export default function App() {
                 <Route path="location">
                   <Route path="list" element={<LocationList />} />
                   <Route path="add" element={<LocationAdd />} />
+                  <Route path="edit/:id" element={<LocationEdit />} />
+
                 </Route>
               </Route>
 
