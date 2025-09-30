@@ -14,6 +14,15 @@ const locationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         default: null,
+    },
+    status: {
+        type: Number,
+        default: 1, 
+    },
+    trash: {
+        type: String,
+        enum: ["Yes", "No"],
+        default: "No", 
     }
 }, { timestamps: true });
 
