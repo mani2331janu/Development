@@ -168,8 +168,17 @@ const LocationStatusChange = async (req, res) => {
 
 const fetchDetails = async (req, res) => {
     try {
-        const {location_name} = req.body         
+        const {location_name} = req.body   
+        const filteredData = await Location.find({
+            location_name:{$regex:location_name,$options:"i"},
+            status:1,
+            trash:"No"
+        });
+        res.json(filteredData)
+              
     } catch (error) {
+        console.log(error);
+        
         res.status(500).json({ message: "Server Error" })
     }
 }

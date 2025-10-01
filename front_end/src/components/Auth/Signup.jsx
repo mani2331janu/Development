@@ -17,7 +17,13 @@ const Signup = () => {
   const schema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     email: Yup.string().required("Email is required").matches(/^[a-zA-Z0-9._]+@[a-zA-Z0-9.-]{3,15}\.[a-zA-Z]{2,4}$/, "Enter Valid Email"),
-    password: Yup.string().required("Password is required"),
+    password: Yup.string()
+      .required("Password is required")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character"
+      ),
+
   });
 
   const {

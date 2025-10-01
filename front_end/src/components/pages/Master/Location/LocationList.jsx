@@ -89,15 +89,23 @@ const LocationList = () => {
   const handleFilterSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!filterLocation) {
+        getAllList();
+      }
       const res = await api.post(`${api_url}api/master/location/filterData`, {
-        location_name: filterLocation, // send directly in the body
+        location_name: filterLocation,
       });
       console.log("Filtered data:", res.data);
-      setLocations(res.data); // update your table with filtered results
+      setLocations(res.data);
     } catch (err) {
       notifyError(err.response?.data?.message || "Something went wrong!");
     }
   };
+
+  const handleReset = () => {
+    setFilterLocation("");
+    getAllList();
+  }
 
 
   return (
@@ -106,7 +114,9 @@ const LocationList = () => {
         <h3 className="text-lg font-bold">Location List</h3>
 
         <div className="flex space-x-2">
-          <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+          <button
+            onClick={()=>{navigate("/master/location/importLocation")}}
+            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
             Import
           </button>
           <button onClick={handleFilter}
@@ -147,6 +157,13 @@ const LocationList = () => {
             className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 mt-2"
           >
             Apply
+          </button>
+          <button
+            onClick={handleReset}
+            type="submit"
+            className="ml-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 mt-2"
+          >
+            Reset
           </button>
         </form>
 
