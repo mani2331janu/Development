@@ -1,4 +1,5 @@
 const Location = require("../../models/Master/Location");
+const Upload = require("../../models/Administration/UploadLog");
 
 const locationStore = async (req, res) => {
     try {
@@ -168,20 +169,43 @@ const LocationStatusChange = async (req, res) => {
 
 const fetchDetails = async (req, res) => {
     try {
-        const {location_name} = req.body   
+        const { location_name } = req.body
         const filteredData = await Location.find({
-            location_name:{$regex:location_name,$options:"i"},
-            status:1,
-            trash:"No"
+            location_name: { $regex: location_name, $options: "i" },
+            status: 1,
+            trash: "No"
         });
         res.json(filteredData)
-              
+
     } catch (error) {
         console.log(error);
-        
+
         res.status(500).json({ message: "Server Error" })
     }
 }
+
+const importSubmit = async (req, res) => {
+    try {
+        console.log("Imported Excel Data:", req.importedData);
+
+        const importedData = req.importedData;
+        const createdBy = req.user?.id || null;
+
+        if (!importedData || importedData.length === 0) {
+            return res.status(400).json({ message: "No data found in Excel file" });
+        }
+
+        return res.status(200).json({
+            message: "File received successfully",
+            rows: importedData.length,
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while importing" });
+    }
+};
+
 
 
 
@@ -194,6 +218,7 @@ module.exports = {
     LocationView,
     LocationDelete,
     LocationStatusChange,
-    fetchDetails
+    fetchDetails,
+    importSubmit
 };
 

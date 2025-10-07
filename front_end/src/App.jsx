@@ -17,6 +17,7 @@ import LocationAdd from "./components/pages/Master/Location/LocationAdd";
 import LocationEdit from "./components/pages/Master/Location/LocationEdit";
 import LocationView from "./components/pages/Master/Location/LocationView";
 import LocationImport from "./components/pages/Master/Location/LocationImport";
+import UploadLogList from "./components/pages/Administration/UploadLog/UploadLogList";
 
 export default function App() {
   return (
@@ -61,6 +62,12 @@ export default function App() {
               <Route index element={<Dashboard />} />
               <Route path="profile" element={<Profile />} />
 
+              <Route path="administration">
+                <Route path="upload-log">
+                  <Route path="list" element={<UploadLogList />} />
+                </Route>
+              </Route>
+
               {/* master location */}
               <Route path="master">
                 <Route path="location">
@@ -69,9 +76,6 @@ export default function App() {
                   <Route path="edit/:id" element={<LocationEdit />} />
                   <Route path="view/:id" element={<LocationView />} />
                   <Route path="importLocation" element={<LocationImport />} />
-
-
-
                 </Route>
               </Route>
 

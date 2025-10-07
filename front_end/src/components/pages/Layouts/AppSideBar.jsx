@@ -10,11 +10,13 @@ import {
   FaMapMarkerAlt,
   FaHotel,
   FaBuilding,
-  FaCogs ,
+  FaCogs,
   FaMinusSquare,
   FaTimesCircle,
 } from "react-icons/fa";
 import { GrMapLocation } from "react-icons/gr";
+import { MdAdminPanelSettings,MdOutlineAdminPanelSettings } from "react-icons/md";
+
 
 import { useTheme } from "../../../context/ThemeContext";
 import "../../../App.css";
@@ -26,21 +28,21 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
   // Define colors based on theme
   const colors = theme === "dark"
     ? {
-        sidebarBg: "#101828",
-        text: "white",
-        hoverBg: "#374151",
-        hoverText: "white",
-        activeBg: "#111827",
-        activeText: "#fbbf24",
-      }
+      sidebarBg: "#101828",
+      text: "white",
+      hoverBg: "#374151",
+      hoverText: "white",
+      activeBg: "#111827",
+      activeText: "#fbbf24",
+    }
     : {
-        sidebarBg: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
-        text: "white",
-        hoverBg: "white",
-        hoverText: "black",
-        activeBg: "black",
-        activeText: "white",
-      };
+      sidebarBg: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
+      text: "white",
+      hoverBg: "white",
+      hoverText: "black",
+      activeBg: "black",
+      activeText: "white",
+    };
 
   return (
     <aside
@@ -98,17 +100,27 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
             Dashboard
           </MenuItem>
 
-          <SubMenu icon={<FaCogs  />} label="Master">
+          <SubMenu icon={<MdOutlineAdminPanelSettings />} label="Administration">
+            <MenuItem
+              icon={<MdAdminPanelSettings />}
+              component={<NavLink to="administration/upload-log/list" />}
+            >
+              Upload Log
+            </MenuItem>
+
+          </SubMenu>
+
+          <SubMenu icon={<FaCogs />} label="Master">
             <MenuItem
               icon={<GrMapLocation />}
               component={<NavLink to="master/location/list" />}
             >
               Location Master
             </MenuItem>
-           
+
           </SubMenu>
 
-          
+
         </Menu>
       </Sidebar>
     </aside>
