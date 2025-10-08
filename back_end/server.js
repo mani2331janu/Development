@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes");
 const masterRoute = require("./routes/masterRoutes");
+const adminRoute = require("./routes/administrationRoutes");
 const { authMiddleware } = require("./middleware/authMiddleware");
 
 const app = express();
@@ -13,6 +14,8 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/master",authMiddleware,masterRoute);
+app.use("/api/administration",authMiddleware,adminRoute);
+
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Atlas connected"))

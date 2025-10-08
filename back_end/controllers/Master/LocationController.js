@@ -184,29 +184,104 @@ const fetchDetails = async (req, res) => {
     }
 }
 
+
 const importSubmit = async (req, res) => {
     try {
+        console.log("File:", req.file?.originalname);
         console.log("Imported Excel Data:", req.importedData);
 
         const importedData = req.importedData;
         const createdBy = req.user?.id || null;
 
         if (!importedData || importedData.length === 0) {
+            await Upload.create({
+                file_name: req.file?.originalname || "Unknown File",
+                errors_reason: JSON.stringify([
+                    { error: "File is empty or contains no valid rows" },
+                ]),
+                status: 2, 
+                created_by: createdBy,
+            });
+
             return res.status(400).json({ message: "No data found in Excel file" });
         }
 
+        const validRows = [];
+        const errorsArray = [];
+
+        for (let i = 0; i < importedData.length; i++) {
+            const row = importedData[i];
+            const rowErrors = {};
+
+            const locationName = row["Location Name"]?.trim();
+
+            if (!locationName) {
+                rowErrors["Location Name"] = "Location Name is required";
+            } else {
+                const existing = await Location.findOne({ location_name: locationName });
+                if (existing) {
+                    rowErrors["Duplicate"] = `Location '${locationName}' already exists`;
+                }
+            }
+
+            if (Object.keys(rowErrors).length > 0) {
+                errorsArray.push({
+                    row: i + 2,
+                    errors: rowErrors
+                })
+            } else {
+                validRows.push({
+                    location_name: locationName,
+                    createdBy: createdBy
+                })
+            }
+
+        }
+        console.log(errorsArray);
+
+
+        if (errorsArray.length > 0) {
+            await Upload.create({
+                file_name: req.file?.originalname || "Unknown file",
+                errors_reason: JSON.stringify(errorsArray, null, 2),
+                status: 2,
+                created_by: createdBy
+            })
+
+            return res.status(400).json({
+                message: "Validation failed. Check Upload Log.",
+                errors: errorsArray,
+            });
+        }
+
+        if (validRows.length > 0) {
+            await Location.insertMany(validRows);
+        }
+
+        await Upload.create({
+            file_name: req.file?.originalname || "Unknown File",
+            errors_reason: null,
+            status: 3, 
+            created_by: createdBy,
+        });
+
         return res.status(200).json({
-            message: "File received successfully",
-            rows: importedData.length,
+            message: `${validRows.length} locations imported successfully.`,
+            imported: validRows.length,
         });
 
     } catch (err) {
-        console.error(err);
+        console.error("Import error:", err);
+        await Upload.create({
+            file_name: req.file?.originalname || "Unknown File",
+            errors_reason: JSON.stringify([{ error: err.message }]),
+            status: 1, 
+            created_by: req.user?.id || null,
+        });
+
         return res.status(500).json({ message: "Server error while importing" });
     }
 };
-
-
 
 
 

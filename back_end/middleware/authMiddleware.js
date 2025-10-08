@@ -27,7 +27,6 @@ const allowedExtensions = {
 };
 
 const importHandler = (type, moduleName) => {
-    console.log(1);
     
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {

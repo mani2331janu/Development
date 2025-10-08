@@ -45,7 +45,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
           <MenuIcon size={20} />
         </button>
         <span className="text-xl font-bold text-gray-800 dark:text-gray-200 transition-colors duration-300">
-          Student Management Portal
+          Medi Track
         </span>
       </div>
 

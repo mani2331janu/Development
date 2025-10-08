@@ -18,6 +18,7 @@ import LocationEdit from "./components/pages/Master/Location/LocationEdit";
 import LocationView from "./components/pages/Master/Location/LocationView";
 import LocationImport from "./components/pages/Master/Location/LocationImport";
 import UploadLogList from "./components/pages/Administration/UploadLog/UploadLogList";
+import UploadLogView from "./components/pages/Administration/UploadLog/UploadLogView";
 
 export default function App() {
   return (
@@ -65,6 +66,7 @@ export default function App() {
               <Route path="administration">
                 <Route path="upload-log">
                   <Route path="list" element={<UploadLogList />} />
+                  <Route path="view/:id" element={<UploadLogView />} />
                 </Route>
               </Route>
 

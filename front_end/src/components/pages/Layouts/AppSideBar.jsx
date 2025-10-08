@@ -64,7 +64,7 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
         {/* Header / toggle */}
         <div className="flex items-center justify-between px-4 py-3">
           {!collapsed && !isMobile && (
-            <span className="font-bold text-lg ps-2 font-serif">My App</span>
+            <span className="font-bold text-lg ps-2 font-serif">Medi Track</span>
           )}
           <button onClick={onToggle} className="text-white hover:text-gray-300">
             {collapsed ? <FaMinusSquare size={22} /> : <FaTimesCircle size={22} />}

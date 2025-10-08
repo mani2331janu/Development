@@ -70,6 +70,8 @@ const LocationImport = () => {
             const message =
                 error.response?.data?.message || "File upload failed. Try again.";
             notifyError(message);
+            reset();
+
         }
     };
 
