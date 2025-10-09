@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import DataTable from 'react-data-table-component';
-import api from '../../../../utils/api';
-import { getUploadLogStatus } from '../../../../utils/helper';
+import React, { useEffect, useState } from "react";
+import DataTable from "react-data-table-component";
+import api from "../../../../utils/api";
+import { getUploadLogStatus } from "../../../../utils/helper";
 import { AiOutlineEye } from "react-icons/ai";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
-import jsPDF from 'jspdf';
+import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { CiFilter } from "react-icons/ci";
-import Select from 'react-select';
-import { useForm, Controller } from 'react-hook-form';
+import Select from "react-select";
+import { useForm, Controller } from "react-hook-form";
 
 const UploadLogList = () => {
   const [uploadLog, setUploadLog] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
-  const [filterLocation, setFilterLocation] = useState([])
+  const [filterLocation, setFilterLocation] = useState([]);
   const api_url = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   const { control, handleSubmit, reset } = useForm({
-    defaultValues: null
-  })
+    defaultValues: null,
+  });
 
   const fetchUploadLog = async () => {
     try {
@@ -36,13 +36,11 @@ const UploadLogList = () => {
     }
   };
 
-
   const statusOptions = [
-    { value: '1', label: "In Progress" },
-    { value: '2', label: "Failed" },
-    { value: '3', label: "Success" },
+    { value: 1, label: "In Progress" },
+    { value: 2, label: "Failed" },
+    { value: 3, label: "Success" },
   ];
-
 
   const handleFilter = () => {
     setShowFilter((prev) => !prev);
@@ -56,17 +54,24 @@ const UploadLogList = () => {
     const data = uploadLog.map((row, i) => ({
       "#": i + 1,
       "File Name": row.file_name,
-      "Status":
-        row.status == 1 ? "In Progress" :
-          row.status == 2 ? "Failed" :
-            row.status == 3 ? "Success" : "Error",
+      Status:
+        row.status == 1
+          ? "In Progress"
+          : row.status == 2
+          ? "Failed"
+          : row.status == 3
+          ? "Success"
+          : "Error",
       "Created At": new Date(row.createdAt).toLocaleString(),
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Upload Logs");
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, "upload_logs.xlsx");
   };
@@ -79,13 +84,18 @@ const UploadLogList = () => {
     const tableData = uploadLog.map((row, i) => [
       i + 1,
       row.file_name,
-      row.status == 1 ? "In Progress" :
-        row.status == 2 ? "Failed" :
-          row.status == 3 ? "Success" : "Error",
+      row.status == 1
+        ? "In Progress"
+        : row.status == 2
+        ? "Failed"
+        : row.status == 3
+        ? "Success"
+        : "Error",
       new Date(row.createdAt).toLocaleString(),
     ]);
 
-    autoTable(doc, { // <-- use autoTable as a function, pass doc as first param
+    autoTable(doc, {
+      // <-- use autoTable as a function, pass doc as first param
       head: [["#", "File Name", "Status", "Created At"]],
       body: tableData,
       startY: 25,
@@ -114,11 +124,14 @@ const UploadLogList = () => {
       name: "Action",
       cell: (row) => (
         <button
-          onClick={() => { navigate(`/administration/upload-log/view/${row._id}`) }}
-          className='text-blue-600 p-1 text-xl hover:text-black hover:scale-125 transition-transform duration-200'>
+          onClick={() => {
+            navigate(`/administration/upload-log/view/${row._id}`);
+          }}
+          className="text-blue-600 p-1 text-xl hover:text-black hover:scale-125 transition-transform duration-200"
+        >
           <AiOutlineEye />
         </button>
-      )
+      ),
     },
     {
       name: "Created At",
@@ -130,18 +143,21 @@ const UploadLogList = () => {
   const handeleSave = async (data) => {
     console.log(data);
     try {
-      const res = await api.post(`${api_url}api/administration/uploadlog/filterData`, {
-          status : data.upload_status
-      })
-    } catch (error) {
-
-    }
-
-  }
+      const res = await api.post(
+        `${api_url}api/administration/uploadlog/filterData`,
+        {
+          status: data.upload_status,
+        }
+      );
+      console.log(res.data);
+      setUploadLog(res.data.data || res.data);
+    } catch (error) {}
+  };
 
   const handleReset = () => {
     reset();
-  }
+    fetchUploadLog();
+  };
 
   return (
     <div>
@@ -151,11 +167,10 @@ const UploadLogList = () => {
         <div className="flex gap-3">
           <button
             onClick={handleFilter}
-            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 transition-transform duration-400 hover:scale-110 rounded hover:bg-blue-700"
           >
             <CiFilter /> Filter
           </button>
-
         </div>
       </div>
 
@@ -178,15 +193,18 @@ const UploadLogList = () => {
                     options={statusOptions}
                     placeholder="Select Status..."
                     className="text-sm"
-                    onChange={(select) => field.onChange(select ? select.value : null)}
-                    value={statusOptions.find(opt => opt.value === field.value) || null}
+                    onChange={(select) =>
+                      field.onChange(select ? select.value : null)
+                    }
+                    value={
+                      statusOptions.find((opt) => opt.value === field.value) ||
+                      null
+                    }
                   />
                 )}
               />
-
             </div>
           </div>
-
 
           <div className="flex justify-end mt-5 gap-3">
             <button
@@ -208,7 +226,6 @@ const UploadLogList = () => {
 
       <hr className="my-4" />
 
-
       <div className="flex justify-between items-center mt-5 mb-5">
         <div className="flex gap-3">
           <button
@@ -225,12 +242,8 @@ const UploadLogList = () => {
             <FaFilePdf /> PDF
           </button>
         </div>
-
-        <div className="flex ">
-
-        </div>
       </div>
-      <div className='bg-white shadow-md border border-gray-200 rounded-xl'>
+      <div className="bg-white shadow-md border border-gray-200 rounded-xl">
         <DataTable
           columns={columns}
           data={uploadLog}
@@ -240,8 +253,6 @@ const UploadLogList = () => {
           responsive
         />
       </div>
-
-
     </div>
   );
 };

@@ -187,9 +187,6 @@ const fetchDetails = async (req, res) => {
 
 const importSubmit = async (req, res) => {
     try {
-        console.log("File:", req.file?.originalname);
-        console.log("Imported Excel Data:", req.importedData);
-
         const importedData = req.importedData;
         const createdBy = req.user?.id || null;
 
@@ -237,7 +234,6 @@ const importSubmit = async (req, res) => {
             }
 
         }
-        console.log(errorsArray);
 
 
         if (errorsArray.length > 0) {

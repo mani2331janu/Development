@@ -1,6 +1,12 @@
 // AppSidebar.jsx
-import { Sidebar, Menu, MenuItem, SubMenu, sidebarClasses } from "react-pro-sidebar";
-import { NavLink, useLocation } from "react-router-dom";
+import {
+  Sidebar,
+  Menu,
+  MenuItem,
+  SubMenu,
+  sidebarClasses,
+} from "react-pro-sidebar";
+import { NavLink } from "react-router-dom";
 
 import {
   FaTachometerAlt,
@@ -15,34 +21,37 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 import { GrMapLocation } from "react-icons/gr";
-import { MdAdminPanelSettings,MdOutlineAdminPanelSettings } from "react-icons/md";
-
+import {
+  MdAdminPanelSettings,
+  MdOutlineAdminPanelSettings,
+} from "react-icons/md";
+import { FaSuitcaseMedical } from "react-icons/fa6";
 
 import { useTheme } from "../../../context/ThemeContext";
 import "../../../App.css";
 
 export default function AppSidebar({ collapsed, isMobile, onToggle }) {
-  const { pathname } = useLocation();
   const { theme } = useTheme();
 
   // Define colors based on theme
-  const colors = theme === "dark"
-    ? {
-      sidebarBg: "#101828",
-      text: "white",
-      hoverBg: "#374151",
-      hoverText: "white",
-      activeBg: "#111827",
-      activeText: "#fbbf24",
-    }
-    : {
-      sidebarBg: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
-      text: "white",
-      hoverBg: "white",
-      hoverText: "black",
-      activeBg: "black",
-      activeText: "white",
-    };
+  const colors =
+    theme === "dark"
+      ? {
+          sidebarBg: "#101828",
+          text: "white",
+          hoverBg: "#374151",
+          hoverText: "white",
+          activeBg: "#111827",
+          activeText: "#fbbf24",
+        }
+      : {
+          sidebarBg: "linear-gradient(180deg, #7c3aed 0%, #d946ef 100%)",
+          text: "white",
+          hoverBg: "white",
+          hoverText: "black",
+          activeBg: "black",
+          activeText: "white",
+        };
 
   return (
     <aside
@@ -64,10 +73,16 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
         {/* Header / toggle */}
         <div className="flex items-center justify-between px-4 py-3">
           {!collapsed && !isMobile && (
-            <span className="font-bold text-lg ps-2 font-serif">Medi Track</span>
+            <span className="font-bold text-lg ps-2 font-serif">
+              Medi Track
+            </span>
           )}
           <button onClick={onToggle} className="text-white hover:text-gray-300">
-            {collapsed ? <FaMinusSquare size={22} /> : <FaTimesCircle size={22} />}
+            {collapsed ? (
+              <FaMinusSquare size={22} />
+            ) : (
+              <FaTimesCircle size={22} />
+            )}
           </button>
         </div>
 
@@ -100,14 +115,16 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
             Dashboard
           </MenuItem>
 
-          <SubMenu icon={<MdOutlineAdminPanelSettings />} label="Administration">
+          <SubMenu
+            icon={<MdOutlineAdminPanelSettings />}
+            label="Administration"
+          >
             <MenuItem
               icon={<MdAdminPanelSettings />}
               component={<NavLink to="administration/upload-log/list" />}
             >
               Upload Log
             </MenuItem>
-
           </SubMenu>
 
           <SubMenu icon={<FaCogs />} label="Master">
@@ -117,10 +134,13 @@ export default function AppSidebar({ collapsed, isMobile, onToggle }) {
             >
               Location Master
             </MenuItem>
-
+            <MenuItem
+              icon={<FaSuitcaseMedical />}
+              component={<NavLink to="master/medical/list" />}
+            >
+              Medical Master
+            </MenuItem>
           </SubMenu>
-
-
         </Menu>
       </Sidebar>
     </aside>

@@ -19,6 +19,8 @@ import LocationView from "./components/pages/Master/Location/LocationView";
 import LocationImport from "./components/pages/Master/Location/LocationImport";
 import UploadLogList from "./components/pages/Administration/UploadLog/UploadLogList";
 import UploadLogView from "./components/pages/Administration/UploadLog/UploadLogView";
+import MedicalList from "./components/pages/Master/Medical/MedicalList";
+import MedicalAdd from "./components/pages/Master/Medical/MedicalAdd";
 
 export default function App() {
   return (
@@ -79,8 +81,12 @@ export default function App() {
                   <Route path="view/:id" element={<LocationView />} />
                   <Route path="importLocation" element={<LocationImport />} />
                 </Route>
-              </Route>
+                <Route path="medical">
+                  <Route path="list" element={<MedicalList />} />
+                  <Route path="add" element={<MedicalAdd />} />
 
+                </Route>
+              </Route>
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

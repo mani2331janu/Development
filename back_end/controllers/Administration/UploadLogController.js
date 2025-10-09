@@ -28,9 +28,9 @@ const getUploadLogView = async (req, res) => {
 
 const getUploadFilterData = async (req, res) => {
     try {
-        // console.log(req.body);
         const {status} = req.body
-        console.log(status);
+        const data = await UploadLog.find({status:status});
+        return res.status(200).json(data)
 
     } catch (error) {
         console.log(error);

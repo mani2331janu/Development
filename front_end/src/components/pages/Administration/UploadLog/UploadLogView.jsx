@@ -47,7 +47,7 @@ const UploadLogView = () => {
                 <h2 className="text-xl font-semibold text-gray-700">Upload Log Details</h2>
                 <button
                     onClick={() => navigate(-1)}
-                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    className="px-3 text-white py-1 bg-blue-500 rounded transition-transform duration-400 hover:scale-110 hover:bg-blue-700"
                 >
                     Back
                 </button>
