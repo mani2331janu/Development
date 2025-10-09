@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const {uploadLogList,getUploadLogView} = require("../controllers/Administration/UploadLogController")
+const {uploadLogList,getUploadLogView,getUploadFilterData} = require("../controllers/Administration/UploadLogController")
 
 router.get("/uploadlog/list",uploadLogList);
-router.get("/uploadlog/view/:id",getUploadLogView)
+router.get("/uploadlog/view/:id",getUploadLogView);
+router.post("/uploadlog/filterData",getUploadFilterData);
+
 
 module.exports = router

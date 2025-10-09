@@ -26,7 +26,20 @@ const getUploadLogView = async (req, res) => {
     }
 }
 
+const getUploadFilterData = async (req, res) => {
+    try {
+        // console.log(req.body);
+        const {status} = req.body
+        console.log(status);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Server Error" })
+    }
+}
+
 module.exports = {
     uploadLogList,
-    getUploadLogView
+    getUploadLogView,
+    getUploadFilterData
 }
