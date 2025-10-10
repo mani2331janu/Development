@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../../utils/api";
-import { getUploadLogStatus } from "../../../../utils/helper"; 
+import { getUploadLogStatus } from "../../../../utils/helper";
 
 const UploadLogView = () => {
     const { id } = useParams();
@@ -13,6 +13,8 @@ const UploadLogView = () => {
     const fetchUploadLog = async () => {
         try {
             const res = await api.get(`${api_url}api/administration/uploadlog/view/${id}`);
+            console.log(res);
+
             setLog(res.data || res);
         } catch (error) {
             console.error("Error fetching upload log:", error);
@@ -39,7 +41,7 @@ const UploadLogView = () => {
     } catch {
         parsedErrors = [];
     }
-    
+
 
     return (
         <div className="mx-auto mt-6 bg-white  p-6">
@@ -69,7 +71,7 @@ const UploadLogView = () => {
                 <div>
                     <label className="block text-black-900 font-bold text-l  mb-2">Created By</label>
                     <p className="text-gray-800">
-                        {log.created_by?.name || "-"} 
+                        {log.created_by?.name || "-"}
                     </p>
                 </div>
 
@@ -84,13 +86,13 @@ const UploadLogView = () => {
             <hr className="my-5" />
 
             <div>
-                <label className="block text-black-900 font-bold text-l  mb-2">Errors</label>
-                {parsedErrors.length > 0 ? (
+                <label className="block text-black-900 font-bold text-l mb-2">Errors</label>
+                {parsedErrors && parsedErrors.length > 0 ? (
                     <div className="space-y-2 text-sm">
                         {parsedErrors.map((e, index) => (
                             <div key={index} className="border border-red-200 rounded p-3 bg-red-50">
                                 <p className="font-medium text-red-700 mb-2">Row {e.row}</p>
-                                {Object.entries(e.errors).map(([key, val]) => (
+                                {Object.entries(e.errors || {}).map(([key, val]) => (
                                     <p key={key} className="text-red-600 ml-2">
                                         <span className="font-semibold">{key}:</span> {val}
                                     </p>
@@ -102,6 +104,7 @@ const UploadLogView = () => {
                     <p className="text-gray-500 text-sm">No errors recorded.</p>
                 )}
             </div>
+
 
         </div>
     );
