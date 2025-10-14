@@ -9,7 +9,7 @@ const MedicalAdd = () => {
   const navigate = useNavigate();
   const api_url = import.meta.env.VITE_API_URL;
   const [locations, setLocations] = useState([]);
-  const { control, handleSubmit } = useForm();
+  const { register,control, handleSubmit } = useForm();
 
   const fetchLocationName = async () => {
     try {
@@ -47,7 +47,7 @@ const MedicalAdd = () => {
         </button>
       </div>
 
-      <hr className="mt-4 border-gray-300 dark:border-gray-600" />
+      <hr className="mt-4 border-gray-400 dark:border-gray-600" />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-wrap">
@@ -60,7 +60,7 @@ const MedicalAdd = () => {
               Select Location
             </label>
             <Controller
-              name="location" 
+              name="location"
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
@@ -68,7 +68,6 @@ const MedicalAdd = () => {
                   {...field}
                   options={locations}
                   placeholder="Select Location..."
-
                 />
               )}
             />
@@ -94,13 +93,14 @@ const MedicalAdd = () => {
             />
           </div>
         </div>
+        <hr className="mt-4 border-gray-400 dark:border-gray-600" />
 
-        <div className="mt-4 px-2">
+        <div className="mt-4 flex justify-end px-2">
           <button
             type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
           >
-            Submit
+            Save
           </button>
         </div>
       </form>

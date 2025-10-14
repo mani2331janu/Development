@@ -30,7 +30,7 @@ const locationStore = async (req, res) => {
 
 const getAllLocation = async (req, res) => {
     try {
-        const location = await Location.find({ status: 1 }).sort({ _id: -1 });
+        const location = await Location.find({ trash:"No" }).sort({ _id: -1 });
         res.status(200).json(location)
 
     } catch (err) {

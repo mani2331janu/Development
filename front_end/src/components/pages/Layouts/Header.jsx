@@ -40,7 +40,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
           onClick={onToggleSidebar}
           aria-label="Toggle sidebar"
         >
-          <MenuIcon size={20} />
+          <MenuIcon size={20} color={theme == "dark" ? "#e5e7eb" : "#1f2937"}/>
         </button>
         <span className="text-xl font-bold text-gray-800 dark:text-gray-200 transition-colors duration-300">
           Medi Track
@@ -63,10 +63,10 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
             onClick={() => setOpen(!open)}
             className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-gray rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-300"
           >
-            <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-gray-200 flex items-center justify-center text-white font-bold">
+            <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-gray-700 dark:text-white flex items-center justify-center text-white font-bold">
               {user?.name?.[0]?.toUpperCase()}
             </div>
-            <span className="hidden sm:inline text-gray-700 dark:text-black transition-colors duration-300">
+            <span className="hidden sm:inline text-gray-700 dark:text-black transition-colors duration-300 font-bold">
               {user?.name}
             </span>
           </button>

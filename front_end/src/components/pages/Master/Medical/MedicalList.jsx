@@ -1,18 +1,41 @@
 import React, { useState } from "react";
-import DataTable from "react-data-table-component";
+import DataTable, { createTheme } from "react-data-table-component";
 import { CiFilter } from "react-icons/ci";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../../../context/ThemeContext";
 
 const MedicalList = () => {
 const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(false);
 
-
+ const {theme} = useTheme();
   const handleFilter = () => {
     setShowFilter((prev) => !prev);
   };
+
+  createTheme("darkCustom", {
+    text: {
+      primary: "#f9fafb",
+      secondary: "#d1d5db",
+    },
+    background: {
+      default: "#1f2937",
+    },
+    context: {
+      background: "#374151",
+      text: "#FFFFFF",
+    },
+    divider: {
+      default: "#374151",
+    },
+    highlightOnHover: {
+      default: "#374151",
+      text: "#f9fafb",
+    },
+  });
+  
   return (
     <div>
       <div className="flex justify-between items-center mb-5">
@@ -71,7 +94,7 @@ const navigate = useNavigate();
       </div>
 
       <div className="overflow-x-auto bg-white shadow-md border border-gray-200 rounded-xl">
-        <DataTable pagination highlightOnHover responsive />
+        <DataTable pagination highlightOnHover responsive  theme={theme == "dark" ? "darkCustom" : "default"} />
       </div>
     </div>
   );

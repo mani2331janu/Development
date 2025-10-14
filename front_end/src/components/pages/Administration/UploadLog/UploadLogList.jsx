@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import DataTable from "react-data-table-component";
+import DataTable, { createTheme } from "react-data-table-component";
 import api from "../../../../utils/api";
 import { getUploadLogStatus } from "../../../../utils/helper";
 import { AiOutlineEye } from "react-icons/ai";
@@ -12,6 +12,7 @@ import autoTable from "jspdf-autotable";
 import { CiFilter } from "react-icons/ci";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
+import { useTheme } from "../../../../context/ThemeContext";
 
 const UploadLogList = () => {
   const [uploadLog, setUploadLog] = useState([]);
@@ -24,6 +25,9 @@ const UploadLogList = () => {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: null,
   });
+
+   const { theme, toggleTheme } = useTheme();
+
 
   const fetchUploadLog = async () => {
     try {
@@ -159,10 +163,33 @@ const UploadLogList = () => {
     fetchUploadLog();
   };
 
+  createTheme("darkCustom", {
+    text: {
+      primary: "#f9fafb",
+      secondary: "#d1d5db",
+    },
+    background: {
+      default: "#1f2937",
+    },
+    context: {
+      background: "#374151",
+      text: "#FFFFFF",
+    },
+    divider: {
+      default: "#374151",
+    },
+    highlightOnHover: {
+      default: "#374151",
+      text: "#f9fafb",
+    },
+  });
+
   return (
     <div>
       <div className="flex justify-between items-center mb-5">
-        <h2 className="text-xl font-semibold">Upload Logs</h2>
+        <h2 className="text-xl font-bold text-black dark:text-white">
+          Upload Logs
+        </h2>
 
         <div className="flex gap-3">
           <button
@@ -177,11 +204,11 @@ const UploadLogList = () => {
       {showFilter && (
         <form
           onSubmit={handleSubmit(handeleSave)}
-          className="transition-all duration-300 bg-white shadow-md border border-gray-200 rounded-xl p-5 mb-6"
+          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-white/30  dark:border-gray-700/30 shadow-xl transition-all duration-300 bg-white shadow-md  border border-gray-200  rounded-xl p-5 mb-6"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4  ">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
+              <label className="block text-gray-700 dark:text-white font-medium text-gray-600 mb-1">
                 Status
               </label>
               <Controller
@@ -224,7 +251,7 @@ const UploadLogList = () => {
         </form>
       )}
 
-      <hr className="my-4" />
+      <hr className="my-4 border-gray-400 dark:borde-white" />
 
       <div className="flex justify-between items-center mt-5 mb-5">
         <div className="flex gap-3">
@@ -251,6 +278,7 @@ const UploadLogList = () => {
           pagination
           highlightOnHover
           responsive
+          theme={theme == "dark" ? "darkCustom" : "default"}
         />
       </div>
     </div>
