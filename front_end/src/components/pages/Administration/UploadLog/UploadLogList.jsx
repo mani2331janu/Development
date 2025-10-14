@@ -243,7 +243,7 @@ const UploadLogList = () => {
           </button>
         </div>
       </div>
-      <div className="bg-white shadow-md border border-gray-200 rounded-xl">
+      <div className="overflow-x-auto bg-white shadow-md border border-gray-200 rounded-xl">
         <DataTable
           columns={columns}
           data={uploadLog}

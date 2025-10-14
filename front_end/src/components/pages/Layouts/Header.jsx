@@ -26,16 +26,14 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
     notifySuccess("Logout successfully!");
   };
 
-  const handleProfile = () =>{
-    navigate("/profile")
-  }
+  const handleProfile = () => navigate("/profile");
 
   return (
     <header
       style={{ left: sidebarWidth }}
-      className="fixed top-0 right-0 h-16 bg-white dark:bg-gray-900 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 z-50 flex items-center justify-between px-6 font-semibold transition-colors duration-300"
+      className="fixed top-0 right-0 h-16 bg-white dark:bg-gray-900 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 z-50 flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-all duration-300"
     >
-      {/* Left side */}
+      {/* Left */}
       <div className="flex items-center gap-4">
         <button
           className="md:hidden p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300"
@@ -49,12 +47,12 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
         </span>
       </div>
 
-      {/* Right side */}
+      {/* Right */}
       <div className="flex items-center gap-4">
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded hover:bg-red-200 dark:hover:bg-gray-400 bg-red-100 dark:bg-green-200 transition-colors duration-300"
+          className="px-3 py-3 rounded  bg-gray-100 dark:bg-gray-100 hover:bg-gray-200 dark:hover:bg-gray-500  transition-colors duration-300"
         >
           {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
         </button>
@@ -63,9 +61,9 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 px-3 py-1 bg-red-100 rounded hover:bg-gray-100   dark:bg-green-100  transition-colors duration-300"
+            className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-gray rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-300"
           >
-            <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-white-100 flex items-center justify-center text-white font-bold">
+            <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-gray-200 flex items-center justify-center text-white font-bold">
               {user?.name?.[0]?.toUpperCase()}
             </div>
             <span className="hidden sm:inline text-gray-700 dark:text-black transition-colors duration-300">
@@ -77,8 +75,9 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
             <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
               <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
                 <li 
-                onClick={handleProfile}
-                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-300">
+                  onClick={handleProfile}
+                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-300"
+                >
                   Profile
                 </li>
                 <li

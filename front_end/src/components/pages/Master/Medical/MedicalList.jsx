@@ -16,7 +16,7 @@ const navigate = useNavigate();
   return (
     <div>
       <div className="flex justify-between items-center mb-5">
-        <h2 className="text-xl font-semibold">Medical List</h2>
+        <h2 className="text-xl font-bold dark:text-white">Medical List</h2>
 
         <div className="flex gap-3">
           <button
@@ -56,7 +56,7 @@ const navigate = useNavigate();
         </form>
       )}
 
-      <hr className="my-4" />
+      <hr className="my-4 border-gray-400 dark:border-white-700" />
 
       <div className="flex justify-between items-center mt-5 mb-5">
         <div className="flex gap-3">
@@ -70,7 +70,7 @@ const navigate = useNavigate();
         </div>
       </div>
 
-      <div className="bg-white shadow-md border border-gray-200 rounded-xl">
+      <div className="overflow-x-auto bg-white shadow-md border border-gray-200 rounded-xl">
         <DataTable pagination highlightOnHover responsive />
       </div>
     </div>

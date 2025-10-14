@@ -196,7 +196,7 @@ const importSubmit = async (req, res) => {
                 errors_reason: JSON.stringify([
                     { error: "File is empty or contains no valid rows" },
                 ]),
-                status: 2, 
+                status: 2,
                 created_by: createdBy,
             });
 
@@ -257,7 +257,7 @@ const importSubmit = async (req, res) => {
         await Upload.create({
             file_name: req.file?.originalname || "Unknown File",
             errors_reason: null,
-            status: 3, 
+            status: 3,
             created_by: createdBy,
         });
 
@@ -271,13 +271,24 @@ const importSubmit = async (req, res) => {
         await Upload.create({
             file_name: req.file?.originalname || "Unknown File",
             errors_reason: JSON.stringify([{ error: err.message }]),
-            status: 1, 
+            status: 1,
             created_by: req.user?.id || null,
         });
 
         return res.status(500).json({ message: "Server error while importing" });
     }
 };
+
+const fetchLocation = async (req,res) => {
+    try {
+        const data = await Location.find({ status: 1, trash: 'No' });
+
+        return res.status(200).json(data)
+    } catch (err) {
+        return res.status(500).json({ message: "Server Error" })
+    }
+
+}
 
 
 
@@ -290,6 +301,7 @@ module.exports = {
     LocationDelete,
     LocationStatusChange,
     fetchDetails,
-    importSubmit
+    importSubmit,
+    fetchLocation
 };
 

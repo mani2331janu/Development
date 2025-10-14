@@ -1,5 +1,5 @@
 const express = require("express");
-const { locationStore,getAllLocation,LocationEdit, LocationUpdate,LocationView,LocationDelete,LocationStatusChange,fetchDetails,importSubmit} = require("../controllers/Master/LocationController");
+const { locationStore,getAllLocation,LocationEdit, LocationUpdate,LocationView,LocationDelete,LocationStatusChange,fetchDetails,importSubmit,fetchLocation} = require("../controllers/Master/LocationController");
 const {importHandler} = require("../middleware/authMiddleware")
 const router = express.Router();
 
@@ -12,6 +12,7 @@ router.delete("/location/delete/:id",LocationDelete);
 router.put("/location/statusChange/:id",LocationStatusChange);
 router.post("/location/filterData",fetchDetails)
 router.post("/location/importSubmit", importHandler('excel', 'location'),importSubmit)
+router.get("/location/getLocation",fetchLocation)
 
 
 
