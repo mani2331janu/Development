@@ -1,144 +1,113 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Select from "react-select";
-import api from "../../../../utils/api";
-import { useForm, Controller } from "react-hook-form";
+import React from 'react'
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom'
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from 'axios';
+import { notifySuccess, notifyError } from '../../../../utils/notify';
 
-const MedicalAdd = () => {
-  const navigate = useNavigate();
-  const api_url = import.meta.env.VITE_API_URL;
-  const [locations, setLocations] = useState([]);
+const LocationAdd = () => {
+    const navigate = useNavigate();
+    const api_url = import.meta.env.VITE_API_URL
 
-  // ✅ Yup validation schema
-  const schema = Yup.object().shape({
-    location: Yup.object().required("Location is required"), // Select returns an object
-    medical_name: Yup.string().required("Medical Name is required"),
-  });
-
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const fetchLocationName = async () => {
-    try {
-      const res = await api.get(`${api_url}api/master/location/getLocation`);
-      const options = res.data.map((m) => ({
-        value: m._id,
-        label: m.location_name,
-      }));
-      setLocations(options);
-    } catch (err) {
-      console.log(err);
+    const handleBack = () => {
+        navigate("/master/location/list");
     }
-  };
 
-  useEffect(() => {
-    fetchLocationName();
-  }, []);
+    // Validation schema
+    const schema = Yup.object().shape({
+        location_name: Yup.string().required("Location is required"),
+    });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-  };
+    const { register, handleSubmit, formState: { errors }, reset, setError } = useForm({
+        resolver: yupResolver(schema)
+    });
 
-  return (
-    <div className="p-4">
-      <div className="flex justify-between">
-        <h3 className="text-lg font-bold text-gray-800 dark:text-white">
-          <span>Medical / </span>
-          <span>Add</span>
-        </h3>
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-blue-500 text-white text-l font-bold rounded px-3 py-1 transition-transform duration-400 hover:scale-110 hover:bg-blue-700"
-        >
-          Back
-        </button>
-      </div>
+    const handleSave = async (data) => {
+        try {
+            const token = localStorage.getItem("token");
+            const user = JSON.parse(localStorage.getItem("user"));
 
-      <hr className="mt-4 border-gray-400 dark:border-gray-600" />
+            if (!token || !user) {
+                notifyError("You must be logged in");
+                return;
+            }
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-wrap">
-          {/* Select Location */}
-          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
-            >
-              Select Location
-            </label>
-            <Controller
-              name="location"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  options={locations}
-                  placeholder="Select Location..."
-                  className="text-gray-900 dark:text-gray-200"
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      minHeight: "42px", // match input height
-                      borderColor: field.value ? "#3b82f6" : "#9ca3af",
-                      backgroundColor: "#ffffff",
-                    }),
-                  }}
-                />
-              )}
-            />
-            {errors.location && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.location.message}
-              </p>
-            )}
-          </div>
+            const payload = { location_name: data.location_name };
 
-          {/* Medical Name */}
-          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
-            >
-              Medical Name
-            </label>
-            <input
-              type="text"
-              {...register("medical_name")}
-              className="border border-gray-400 dark:border-gray-600 
-                bg-white dark:bg-gray-800 
-                text-gray-900 dark:text-gray-200
-                rounded w-full p-2 
-                focus:outline-none focus:ring focus:ring-blue-500"
-              placeholder="Enter Medical Name"
-            />
-            {errors.medical_name && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.medical_name.message}
-              </p>
-            )}
-          </div>
+            const res = await axios.post(`${api_url}api/master/location/add`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            notifySuccess(res.data.message || "Location created successfully!");
+            reset();
+            navigate("/master/location/list")
+
+        } catch (error) {
+            console.error(error.response?.data || error.message);
+
+            if (error.response?.status === 400 && error.response.data.message) {
+                setError("location_name", {
+                    type: "server",
+                    message: error.response.data.message
+                });
+            } else {
+                notifyError(error.response?.data?.message || "Something went wrong!");
+                navigate("/master/location/list")
+            }
+        }
+    };
+
+    return (
+        <div className='p-4'>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold">Location Add</h3>
+                <button
+                    onClick={handleBack}
+                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                >
+                    Back
+                </button>
+            </div>
+
+            <hr className='mt-3 mb-3 border-gray-200' />
+
+            {/* Form */}
+            <form onSubmit={handleSubmit(handleSave)}>
+                <div className='flex flex-wrap -mx-2'>
+                    <div className="w-full sm:w-1/2 md:w-1/3 px-2 mb-4">
+                        <label htmlFor="location_name" className="block mb-1 font-medium text-gray-700">Location</label>
+                        <input
+                            {...register("location_name")}
+                            id="location_name"
+                            type="text"
+                            placeholder="Type here..."
+                            className={`w-full text-sm border rounded-md px-3 py-2 mt-2 transition 
+                                ${errors.location_name ? 'border-red-500' : 'border-slate-300'} 
+                                focus:outline-none focus:border-gray-600`}
+                        />
+                        {errors.location_name && (
+                            <p className="text-red-500 text-sm mt-1">{errors.location_name.message}</p>
+                        )}
+                    </div>
+                </div>
+
+                <hr className='mt-3 mb-3 border-gray-200' />
+
+                <div className="flex justify-end mt-4">
+                    <button
+                        type="submit"
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                    >
+                        Save
+                    </button>
+                </div>
+            </form>
         </div>
+    )
+}
 
-        <hr className="mt-4 border-gray-400 dark:border-gray-600" />
-
-        <div className="mt-4 flex justify-end px-2">
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-          >
-            Save
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-};
-
-export default MedicalAdd;
+export default LocationAdd;

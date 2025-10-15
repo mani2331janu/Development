@@ -131,7 +131,8 @@ const UploadLogList = () => {
           onClick={() => {
             navigate(`/administration/upload-log/view/${row._id}`);
           }}
-          className="text-blue-600 p-1 text-xl hover:text-black hover:scale-125 transition-transform duration-200"
+          title="View Details"
+          className="text-blue-600 p-1 text-xl hover:text-black hover:scale-125 transition-transform duration-200 dark:text-white"
         >
           <AiOutlineEye />
         </button>
