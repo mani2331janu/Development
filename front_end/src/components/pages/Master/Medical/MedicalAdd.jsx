@@ -59,7 +59,7 @@ const MedicalAdd = () => {
       );
 
       if (res.data.success) {
-        notifyError(res.data.message);
+        notifySuccess(res.data.message);
         reset();
         navigate(-1);
       } else {

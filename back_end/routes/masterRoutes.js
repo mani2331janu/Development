@@ -15,11 +15,8 @@ router.post("/location/filterData",LocationController.fetchDetails)
 router.post("/location/importSubmit", importHandler('excel', 'location'),LocationController.importSubmit)
 router.get("/location/getLocation",LocationController.fetchLocation)
 
+router.get("/medical/list",MedicalController.MedicalList)
 router.post("/medical/add/submit",MedicalController.MedicalStore)
-
-
-
-
 
 
 module.exports = router;

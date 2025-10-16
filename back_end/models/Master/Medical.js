@@ -4,7 +4,7 @@ const medicalSchema = new mongoose.Schema(
   {
     location_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Location",
+      ref: "master_location",
       required: true,
     },
     medical_name: {
@@ -29,8 +29,8 @@ const medicalSchema = new mongoose.Schema(
     },
     trash: {
       type: String,
-      enum: ["yes", "no"], 
-      default: "no",
+      enum: ["Yes", "No"], 
+      default: "No",
     },
   },
   {

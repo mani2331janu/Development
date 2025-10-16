@@ -1,5 +1,20 @@
 const Medical = require("../../models/Master/Medical");
+const MedicalList = async (req, res) => {
+  try {
+    const data = await Medical.find({ trash: "No" })
+      .populate({
+             path:"location_id",
+             select:"location_name"
+      })
+      .select("medical_name status createdAt")
 
+      return res.status(200).json({success:true,data})
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server Error" })
+  }
+}
 const MedicalStore = async (req, res) => {
   try {
     const { location_id, medical_name } = req.body;
@@ -15,7 +30,7 @@ const MedicalStore = async (req, res) => {
       location_id: location_id,
       medical_name: medical_name.trim(),
     });
-    
+
     if (existsMedicalName) {
       return res
         .status(409)
@@ -40,4 +55,4 @@ const MedicalStore = async (req, res) => {
   }
 };
 
-module.exports = { MedicalStore };
+module.exports = { MedicalStore, MedicalList };
