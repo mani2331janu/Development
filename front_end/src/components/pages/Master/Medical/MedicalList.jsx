@@ -6,7 +6,9 @@ import { IoIosAddCircle } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../../context/ThemeContext";
 import api from "../../../../utils/api";
-import { AiOutlineEye } from "react-icons/ai";
+import { AiOutlineEdit, AiOutlineEye } from "react-icons/ai";
+import { MdDeleteForever } from "react-icons/md";
+import { TbEdit } from "react-icons/tb";
 
 const MedicalList = () => {
   const navigate = useNavigate();
@@ -84,17 +86,35 @@ const MedicalList = () => {
     {
       name: "Action",
       cell: (row) => (
-        <button
-          onClick={() => {
-            navigate(`/master/medical/view/${row._id}`);
-          }}
-          title="View Details"
-          className="text-blue-600 p-1 text-xl hover:text-black hover:scale-125 transition-transform duration-200 dark:text-white"
-        >
-          <AiOutlineEye />
-        </button>
+        <>
+          <button
+            onClick={() => navigate(`/master/medical/edit/${row._id}`)}
+            title="Edit Details"
+            className="text-green-600 p-1 text-xl hover:text-black  dark:text-white"
+          >
+            <TbEdit />
+          </button>
+          <button
+            onClick={() => navigate(`/master/medical/view/${row._id}`)}
+            title="View Details"
+            className="text-blue-600 p-1 text-xl hover:text-black  dark:text-white"
+          >
+            <AiOutlineEye />
+          </button>
+
+          <button
+            onClick={() => navigate(`/master/medical/delete/${row._id}`)}
+            title="Delete Details"
+            className="text-blue-600 p-1 text-xl hover:text-black  dark:text-white"
+          >
+            <MdDeleteForever />
+          </button>
+
+
+        </>
       ),
     },
+
     {
       name: "Created At",
       selector: (row) => new Date(row.createdAt).toLocaleDateString(),

@@ -3,12 +3,12 @@ const MedicalList = async (req, res) => {
   try {
     const data = await Medical.find({ trash: "No" })
       .populate({
-             path:"location_id",
-             select:"location_name"
+        path: "location_id",
+        select: "location_name"
       })
       .select("medical_name status createdAt")
 
-      return res.status(200).json({success:true,data})
+    return res.status(200).json({ success: true, data })
 
   } catch (error) {
     console.log(error);
@@ -55,4 +55,24 @@ const MedicalStore = async (req, res) => {
   }
 };
 
-module.exports = { MedicalStore, MedicalList };
+const viewMedicalList = async (req, res) => {
+  try {
+    const { id } = req.params
+    const data = await Medical.findById({ _id: id })
+      .populate({
+        path: "location_id",
+        select: "location_name",
+      })
+      .populate({
+        path: "created_by",
+        select: "name",
+      })
+
+    return res.status(200).json({ success: true, data })
+
+  } catch (error) {
+    return res.status(500).json({ message: "Server Error" })
+  }
+}
+
+module.exports = { MedicalStore, MedicalList, viewMedicalList };

@@ -17,6 +17,7 @@ router.get("/location/getLocation",LocationController.fetchLocation)
 
 router.get("/medical/list",MedicalController.MedicalList)
 router.post("/medical/add/submit",MedicalController.MedicalStore)
+router.get("/medical/view/:id",MedicalController.viewMedicalList)
 
 
 module.exports = router;

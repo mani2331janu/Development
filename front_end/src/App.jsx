@@ -21,6 +21,8 @@ import UploadLogList from "./components/pages/Administration/UploadLog/UploadLog
 import UploadLogView from "./components/pages/Administration/UploadLog/UploadLogView";
 import MedicalList from "./components/pages/Master/Medical/MedicalList";
 import MedicalAdd from "./components/pages/Master/Medical/MedicalAdd";
+import MedicalView from "./components/pages/Master/Medical/MedicalView";
+import MedicalEdit from "./components/pages/Master/Medical/MedicalEdit";
 
 export default function App() {
   return (
@@ -84,7 +86,8 @@ export default function App() {
                 <Route path="medical">
                   <Route path="list" element={<MedicalList />} />
                   <Route path="add" element={<MedicalAdd />} />
-
+                  <Route path="view/:id" element={<MedicalView />} />
+                  <Route path="edit/:id" element={<MedicalEdit />} />
                 </Route>
               </Route>
             </Route>

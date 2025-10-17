@@ -1,7 +1,14 @@
 import React from "react";
+// utils/formatDate.js
+import dayjs from "dayjs";
+
+export const displayDateFormat = (date) => {
+    return date ? dayjs(date).format("DD-MM-YYYY") : "";
+};
+
 
 export const getUploadLogStatus = (status) => {
-    
+
     switch (status) {
         case 1:
             return (
@@ -11,7 +18,7 @@ export const getUploadLogStatus = (status) => {
             );
         case 2:
             return (
-                <span className="bg-red-500 text-white px-2 py-1 inline-flex items-center rounded-md text-sm">    
+                <span className="bg-red-500 text-white px-2 py-1 inline-flex items-center rounded-md text-sm">
                     Failed
                 </span>
             );
@@ -29,3 +36,4 @@ export const getUploadLogStatus = (status) => {
             );
     }
 };
+
