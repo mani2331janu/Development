@@ -16,7 +16,6 @@ const LocationEdit = () => {
     const fetchLocation = async () => {
         try {
             const res = await api.get(`${api_url}api/master/location/edit/${id}`);
-            console.log(res.data)
             setValue("location_name", res.data.location_name);
             setValue("id", res.data._id);
         } catch (err) {

@@ -46,12 +46,14 @@ const MedicalAdd = () => {
     fetchLocationName();
   }, []);
 
-  const onSubmit = async (data) => {
+  const onSubmitAdd = async (data) => {
     try {
       const payload = {
-        location_id: data.location_id.value,
         medical_name: data.medical_name,
+        location_id: data.location_id.value,
       };
+
+
 
       const res = await api.post(
         `${api_url}api/master/medical/add/submit`,
@@ -63,23 +65,25 @@ const MedicalAdd = () => {
         reset();
         navigate(-1);
       } else {
+
         setError("medical_name", {
           type: "manual",
-          message: res.data.message || "Somethings wents wrong",
+          message: res.data.message || "Something went wrong",
         });
       }
-    } catch (error) {
-      console.error(error);
-      if (error.response?.data?.message) {
+    } catch (err) {
+
+      if (err.response?.data?.message) {
         setError("medical_name", {
           type: "manual",
-          message: error.response.data.message,
+          message: err.response.data.message,
         });
       } else {
         notifyError("Server error");
       }
     }
   };
+
 
   return (
     <div className="p-4">
@@ -92,7 +96,7 @@ const MedicalAdd = () => {
         <button
           onClick={() => navigate(-1)}
           type="button"
-          className="bg-blue-500 text-white font-bold rounded px-3 py-1 transition-transform duration-300 hover:scale-110 hover:bg-blue-700"
+          className="bg-blue-500 text-white font-bold rounded px-3 py-1  hover:bg-blue-700"
         >
           Back
         </button>
@@ -101,7 +105,7 @@ const MedicalAdd = () => {
       <hr className="mt-4 border-gray-400 dark:border-gray-600" />
 
       {/* Form Section */}
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmitAdd)}>
         <div className="flex flex-wrap">
           {/* Select Location */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">

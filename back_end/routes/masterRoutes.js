@@ -18,6 +18,13 @@ router.get("/location/getLocation",LocationController.fetchLocation)
 router.get("/medical/list",MedicalController.MedicalList)
 router.post("/medical/add/submit",MedicalController.MedicalStore)
 router.get("/medical/view/:id",MedicalController.viewMedicalList)
+router.get("/medical/edit/:id",MedicalController.MedicalEdit)
+router.put("/medical/update/:id",MedicalController.MedicalUpdate)
+router.put("/medical/delete/:id",MedicalController.MedicalDelete)
+router.put("/medical/statusChange/:id",MedicalController.MedicalStatus)
+router.get("/medical/fetchMedicine/:id",MedicalController.MedicalData)
+router.post("/medical/filterData",MedicalController.FilterData)
+
 
 
 module.exports = router;
