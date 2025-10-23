@@ -13,6 +13,11 @@ import { notifyError, notifySuccess } from "../../../../utils/notify";
 import Swal from "sweetalert2";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { displayDateFormat, displayStatus } from "../../../../utils/helper";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const MedicalList = () => {
   const navigate = useNavigate();
@@ -24,10 +29,11 @@ const MedicalList = () => {
   const [locationMedical, setLocationMedical] = useState([]);
 
   const api_url = import.meta.env.VITE_API_URL;
-
+  const defaultValues = { location_id: null, medical_id: null, status: null }
   const { control, handleSubmit, reset, watch } = useForm({
-    defaultValues: { location_id: null, medical_id: null },
+    defaultValues,
   });
+
 
   const selectedLocation = watch("location_id");
 
@@ -69,12 +75,10 @@ const MedicalList = () => {
         setLocationMedical(options);
       } else {
         setLocationMedical([]);
-        notifyError(res.data.message);
       }
     } catch (err) {
       console.log(err);
       const message = err.response?.data?.message || "Server Error";
-      notifyError(message);
       setLocationMedical([]);
     }
   };
@@ -133,22 +137,22 @@ const MedicalList = () => {
     }
   };
 
-  
+
   // Filter submit
   const filterData = async (formData) => {
     try {
-     
+
       const payload = {
         location_id: formData.location_id?.value || "",
         medical_id: formData.medical_id?.value || "",
-        status: formData.status?.value ?? "", // allow 0
+        status: formData.status?.value ?? "",
       };
 
-     
+
       const res = await api.post(`${api_url}api/master/medical/filterData`, payload);
 
       if (res.data.success) {
-       
+
         setMedical(res.data.data);
 
       } else {
@@ -165,7 +169,7 @@ const MedicalList = () => {
   // Toggle filter form
   const handleFilter = () => setShowFilter((prev) => !prev);
 
- 
+
   createTheme("darkCustom", {
     text: { primary: "#f9fafb", secondary: "#d1d5db" },
     background: { default: "#1f2937" },
@@ -219,6 +223,7 @@ const MedicalList = () => {
         </>
       ),
     },
+    { name: "Created By", selector: (row) => row.created_by?.name },
     { name: "Created At", selector: (row) => new Date(row.createdAt).toLocaleDateString() },
   ];
 
@@ -227,8 +232,53 @@ const MedicalList = () => {
     { value: 0, label: "Inactive" },
   ];
 
+  const exportToExcel = () => {
+    const data = medical.map((row, i) => ({
+      "#": i + 1,
+      "Location Name": row.location_id?.location_name,
+      "Medical name": row.medical_name,
+      "Status": displayStatus(row.status),
+      "Created By" : row.created_by?.name,
+      "Created At":  displayDateFormat(row.createdAt),
+    }));
 
-  
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Medical Data");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "Medical Data.xlsx");
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    doc.text("Medical Details", 14, 15);
+
+    const tableData = medical.map((row, i) => [
+      i + 1,
+      row.location_id?.location_name,
+      row.medical_name,
+      displayStatus(row.status),
+      row.created_by?.name,
+      displayDateFormat(row.createdAt)
+    ]);
+
+    autoTable(doc, {
+      
+      head: [["#", "Location Name", "Medical Name", "Status","Created By","Created At"]],
+      body: tableData,
+      startY: 25,
+    });
+
+    doc.save("medical_details.pdf");
+  };
+
+
+
   useEffect(() => {
     medicalList();
     fetchLocationName();
@@ -244,19 +294,19 @@ const MedicalList = () => {
 
   return (
     <div>
-   
+
       <div className="flex justify-between items-center mb-5">
         <h2 className="text-xl font-bold dark:text-white">Medical List</h2>
         <div className="flex gap-3">
           <button
             onClick={handleFilter}
-            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            className="flex cursor-pointer items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
           >
             <CiFilter /> Filter
           </button>
           <button
             onClick={() => navigate("/master/medical/add")}
-            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            className="flex cursor-pointer items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
           >
             <IoIosAddCircle /> Add
           </button>
@@ -288,7 +338,7 @@ const MedicalList = () => {
               />
             </div>
 
-           
+
             <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
               <label className="block text-gray-700 dark:text-white font-medium mb-2">
                 Select Medical
@@ -329,17 +379,17 @@ const MedicalList = () => {
           </div>
 
           <div className="flex justify-end mt-5 gap-3">
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all">
+            <button type="submit" className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all">
               Apply Filter
             </button>
             <button
               type="button"
               onClick={() => {
-                reset(); // Reset all fields
-                setLocationMedical([]); // clear dependent medicals
-                medicalList(); // Reset table
+                reset(defaultValues);
+                setLocationMedical([]);
+                medicalList();
               }}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-all"
+              className="cursor-pointer bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-all"
             >
               Reset
             </button>
@@ -353,10 +403,13 @@ const MedicalList = () => {
       {/* Export Buttons */}
       <div className="flex justify-between items-center mt-5 mb-5">
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+          <button
+            onClick={exportToExcel}
+            className="flex cursor-pointer items-center gap-2 bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
             <FaFileExcel /> Excel
           </button>
-          <button className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+          <button onClick={exportToPDF}
+          className="flex cursor-pointer items-center gap-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
             <FaFilePdf /> PDF
           </button>
         </div>

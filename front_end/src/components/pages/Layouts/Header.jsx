@@ -52,7 +52,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="px-3 py-3 rounded  bg-gray-100 dark:bg-gray-100 hover:bg-gray-200 dark:hover:bg-gray-500  transition-colors duration-300"
+          className="px-3 py-3 cursor-pointer rounded  bg-gray-100 dark:bg-gray-100 hover:bg-gray-200 dark:hover:bg-gray-500  transition-colors duration-300"
         >
           {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
         </button>
@@ -61,7 +61,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-gray rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-300"
+            className="flex cursor-pointer items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-gray rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-300"
           >
             <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-gray-700 dark:text-white flex items-center justify-center text-white font-bold">
               {user?.name?.[0]?.toUpperCase()}

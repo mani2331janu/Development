@@ -116,16 +116,16 @@ const LocationList = () => {
         <div className="flex space-x-2">
           <button
             onClick={()=>{navigate("/master/location/importLocation")}}
-            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+            className="bg-blue-600 cursor-pointer text-white px-3 py-1 rounded hover:bg-blue-700">
             Import
           </button>
           <button onClick={handleFilter}
-            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+            className="bg-blue-600 cursor-pointer text-white px-3 py-1 rounded hover:bg-blue-700">
             Filter
           </button>
           <button
             onClick={handleAdd}
-            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            className="bg-blue-600 cursor-pointer text-white px-3 py-1 rounded hover:bg-blue-700"
           >
             Add
           </button>
@@ -185,32 +185,32 @@ const LocationList = () => {
           <tbody>
             {locations.map((loc, index) => (
               <tr key={loc._id} className="hover:bg-gray-100">
-                <td className="px-4 py-2 border text-center">{index + 1}</td>
-                <td className="px-4 py-2 border text-center">{loc.location_name}</td>
-                <td className="px-4 py-2 border text-center">
-                  <button onClick={() => { statusChange(loc._id, loc.status) }} className="text-blue-600 p-1">
+                <td className="px-4 py-2 border dark:text-white dark:hover:text-black text-center">{index + 1}</td>
+                <td className="px-4 py-2 border dark:text-white dark:hover:text-black text-center">{loc.location_name}</td>
+                <td className="px-4 py-2 border dark:text-white dark:hover:text-black text-center">
+                  <button onClick={() => { statusChange(loc._id, loc.status) }} className="cursor-pointer text-blue-600 p-1">
                     {loc.status == 1 ? "Active" : "In-Active"}
                   </button>
                 </td>
 
-                <td className="px-4 py-2 border text-center">
+                <td className="px-4 dark:text-white dark:hover:text-black py-2 border text-center">
                   <button
                     onClick={() => { navigate(`/master/location/edit/${loc._id}`) }}
-                    className="text-blue-600 p-1 hover:text-black hover:scale-125 transition-transform duration-200"
+                    className="cursor-pointer text-blue-600 p-1 hover:text-black hover:scale-125 transition-transform duration-200"
                   >
                     <TbEdit />
                   </button>
 
                   <button
                     onClick={() => { navigate(`/master/location/view/${loc._id}`) }}
-                    className="text-blue-600 p-1 hover:text-black hover:scale-125 transition-transform duration-200"
+                    className="cursor-pointer text-blue-600 p-1 hover:text-black hover:scale-125 transition-transform duration-200"
                   >
                     <TbEyeDotted />
                   </button>
 
                   <button
                     onClick={() => { handleDelete(loc._id) }}
-                    className="text-blue-600 p-1 hover:text-black hover:scale-125 transition-transform duration-200"
+                    className=" cursor-pointer text-blue-600 p-1 hover:text-black hover:scale-125 transition-transform duration-200"
                   >
                     <MdDeleteForever />
                   </button>

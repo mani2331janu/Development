@@ -6,7 +6,11 @@ const MedicalList = async (req, res) => {
         path: "location_id",
         select: "location_name"
       })
-      .select("medical_name status createdAt")
+      .populate({
+        path: "created_by",
+        select:"name"
+      })
+      .select("medical_name status createdAt created_by")
 
     return res.status(200).json({ success: true, data })
 
@@ -230,7 +234,7 @@ const FilterData = async (req, res) => {
     if (medical_id) query._id = medical_id; 
     if (status !== "") query.status = status;
 
-    const filteredData = await Medical.find(query).populate("location_id");
+    const filteredData = await Medical.find(query).populate("location_id").populate({path:"created_by",select:"name"});
     return res.json({ success: true, data: filteredData });
   } catch (error) {
     console.error(error);

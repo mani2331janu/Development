@@ -37,3 +37,15 @@ export const getUploadLogStatus = (status) => {
     }
 };
 
+export const displayStatus = (status) => {
+  switch (Number(status)) {
+    case 1:
+      return "Active";
+    case 0:
+      return "Inactive"; 
+    default:
+      return "Unknown";
+  }
+};
+
+
