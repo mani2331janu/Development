@@ -111,7 +111,7 @@ const LocationList = () => {
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold">Location List</h3>
+        <h3 className="text-lg font-bold dark:text-white">Location List</h3>
 
         <div className="flex space-x-2">
           <button

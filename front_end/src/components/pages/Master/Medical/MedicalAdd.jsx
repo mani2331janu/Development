@@ -96,7 +96,7 @@ const MedicalAdd = () => {
         <button
           onClick={() => navigate(-1)}
           type="button"
-          className="bg-blue-500 text-white font-bold rounded px-3 py-1  hover:bg-blue-700"
+          className="bg-blue-500 text-white font-bold rounded px-3 py-1  hover:bg-blue-700 cursor-pointer"
         >
           Back
         </button>

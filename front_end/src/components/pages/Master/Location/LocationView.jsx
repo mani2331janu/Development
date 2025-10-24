@@ -31,7 +31,7 @@ const LocationView = () => {
         <div className='p-4'>
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold">Location View</h3>
+                <h3 className="text-xl font-bold text-black dark:text-white">Location View</h3>
                 <button
                     onClick={handleBack}
                     className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
@@ -45,7 +45,7 @@ const LocationView = () => {
             {/* Form */}
             <div className='flex flex-wrap -mx-2'>
                 <div className="w-full sm:w-1/2 md:w-1/3 px-2 mb-4">
-                    <label htmlFor="location_name" className="block mb-1 font-medium text-gray-700">
+                    <label htmlFor="location_name" className="block mb-1 font-medium text-gray-700 dark:text-white">
                         Location
                     </label>
                     <input
@@ -53,7 +53,11 @@ const LocationView = () => {
                         type="text"
                         value={locationName}
                         readOnly
-                        className="w-full text-sm border rounded-md px-3 py-2 mt-2 transition focus:outline-none focus:border-gray-600 bg-gray-100 cursor-not-allowed"
+                        className="border border-gray-400 dark:border-gray-600 
+                            bg-white dark:bg-gray-800 
+                            text-gray-900 dark:text-gray-200
+                            rounded w-full p-2 
+                            cursor-not-allowed"
                     />
                 </div>
             </div>

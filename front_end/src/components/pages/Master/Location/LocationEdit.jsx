@@ -60,7 +60,7 @@ const LocationEdit = () => {
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold">Location Edit</h3>
+                <h3 className="text-xl font-bold text-black dark:text-white">Location Edit</h3>
                 <button
                     onClick={handleBack}
                     className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
@@ -73,18 +73,20 @@ const LocationEdit = () => {
                 <input type="hidden" {...register("id")} />
                 <div className='flex flex-wrap -mx-2'>
                     <div className="w-full sm:w-1/2 md:w-1/3 px-2 mb-4">
-                        <label htmlFor="location_name" className="block mb-1 font-medium text-gray-700">Location</label>
+                        <label htmlFor="location_name" className="block mb-1 text-medium font-bold text-black dark:text-white">Location</label>
                         <input
                             {...register("location_name")}
                             id="location_name"
                             type="text"
                             placeholder="Type here..."
-                            className={`w-full text-sm border rounded-md px-3 py-2 mt-2 transition 
-                                ${errors.location_name ? 'border-red-500' : 'border-slate-300'}
-                                focus:outline-none focus:border-gray-600`}
+                            className="border border-gray-400 dark:border-gray-600 
+                            bg-white dark:bg-gray-800 
+                            text-gray-900 dark:text-gray-200
+                            rounded w-full p-2 
+                            focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         {errors.location_name && (
-                            <p className="text-red-500 text-sm mt-1">{errors.location_name.message}</p>
+                            <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.location_name.message}</p>
                         )}
                     </div>
                 </div>

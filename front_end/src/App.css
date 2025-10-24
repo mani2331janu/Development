@@ -1,7 +1,7 @@
 .ps-submenu-content {
   background: linear-gradient(180deg, #7c3aed 0%, #d946ef 100%) !important;
   border-radius: 8px !important;
-  left: 12px !important;     
+  left: 12px !important;
 }
 
 .ps-menu-button ps-open {
@@ -9,15 +9,24 @@
 }
 
 .dark .ps-submenu-content {
-  background: #1f2937 !important; 
+  background: #1f2937 !important;
   border-radius: 8px !important;
-  left: 12px !important;     
+  left: 12px !important;
 }
 
 .dark .ps-menu-button ps-open {
   width: 30px;
-  background-color: #374151 !important; 
-  color: #fbbf24 !important; 
+  background-color: #374151 !important;
+  color: #fbbf24 !important;
   background: #dde0e4 !important;
 }
 
+/* .ps-menu-button .ps-menu-label {
+  overflow: visible;
+  white-space: break-spaces;
+}
+
+.ps-menuitem-root .ps-submenu-root .ps-menu-label {
+  overflow: visible;
+  white-space: break-spaces;
+} */
