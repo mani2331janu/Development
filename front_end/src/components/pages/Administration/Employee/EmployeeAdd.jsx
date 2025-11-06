@@ -129,6 +129,7 @@ const EmployeeAdd = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    getValues
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues,
@@ -150,6 +151,12 @@ const EmployeeAdd = () => {
         [fieldName]: previewURL,
       }));
     }
+  };
+
+  const handleSaveDraft = () => {
+    const data = getValues(); // ✅ get all current field values (even if invalid)
+    console.log("Draft data:", data);
+    alert("Saved as draft without validation!");
   };
 
   return (
@@ -177,7 +184,7 @@ const EmployeeAdd = () => {
 
           {/* Employee ID */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Employee ID
             </label>
             <input
@@ -198,7 +205,7 @@ const EmployeeAdd = () => {
 
           {/* Name */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className=" required block text-gray-700 dark:text-white font-medium mb-2">
               First Name
             </label>
             <input
@@ -220,7 +227,7 @@ const EmployeeAdd = () => {
 
           {/* last name */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Last Name
             </label>
             <input
@@ -242,7 +249,7 @@ const EmployeeAdd = () => {
 
           {/* Gender */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Gender
             </label>
             <Controller
@@ -265,7 +272,7 @@ const EmployeeAdd = () => {
 
           {/* Blood Group */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Blood Group
             </label>
             <Controller
@@ -288,7 +295,7 @@ const EmployeeAdd = () => {
 
           {/* Profile Image */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className=" required block text-gray-700 dark:text-white font-medium mb-2">
               Profile Image
             </label>
             <input
@@ -324,7 +331,7 @@ const EmployeeAdd = () => {
 
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
             <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
               htmlFor="mobile_no"
             >
               Email
@@ -348,7 +355,7 @@ const EmployeeAdd = () => {
           {/* Mobile */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
             <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
               htmlFor="mobile_no"
             >
               Mobile No
@@ -372,7 +379,7 @@ const EmployeeAdd = () => {
           {/* emg contact no */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
             <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
               htmlFor="emg_mobile_no"
             >
               Emergency Contact Number
@@ -396,7 +403,7 @@ const EmployeeAdd = () => {
           {/* address */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
             <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
               htmlFor="address"
             >
               Address
@@ -420,7 +427,7 @@ const EmployeeAdd = () => {
           {/* city */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
             <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
               htmlFor="city"
             >
               City
@@ -444,7 +451,7 @@ const EmployeeAdd = () => {
           {/* pincode */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
             <label
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
               htmlFor="pincode"
             >
               Pincode
@@ -473,7 +480,7 @@ const EmployeeAdd = () => {
           <div className="w-full sm:w-1/3 lg:w-1/3 mt-3 px-2">
             <label
               htmlFor="bank_name"
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
             >
               Bank Name
             </label>
@@ -497,7 +504,7 @@ const EmployeeAdd = () => {
           <div className="w-full sm:w-1/3 lg:w-1/3 mt-3 px-2">
             <label
               htmlFor="account_number"
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
             >
               Account Number
             </label>
@@ -521,7 +528,7 @@ const EmployeeAdd = () => {
           <div className="w-full sm:w-1/3 lg:w-1/3 mt-3 px-2">
             <label
               htmlFor="ifsc_code"
-              className="block text-gray-700 dark:text-white font-medium mb-2"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
             >
               IFSC Code
             </label>
@@ -547,7 +554,7 @@ const EmployeeAdd = () => {
 
           {/* ID Proof */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               ID Proof
             </label>
             <input
@@ -580,7 +587,7 @@ const EmployeeAdd = () => {
 
           {/* Degree Certificate */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Degree Certificate
             </label>
             <input
@@ -613,7 +620,7 @@ const EmployeeAdd = () => {
 
           {/* Experience Certificate */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
-            <label className="block text-gray-700 dark:text-white font-medium mb-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Experience Certificate
             </label>
             <input
@@ -651,7 +658,10 @@ const EmployeeAdd = () => {
         <div className="mt-4 flex justify-end px-2 gap-3">
           {/* Save as Draft */}
           <button
-            type="submit"
+            type="button"
+            onClick={() => {
+              handleSaveDraft();
+            }}
             className="bg-yellow-600 text-white px-3 py-2 rounded 
                hover:bg-yellow-800 font-semibold transition-colors"
           >

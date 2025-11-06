@@ -21,12 +21,12 @@
   background: #dde0e4 !important;
 }
 
-/* .ps-menu-button .ps-menu-label {
-  overflow: visible;
-  white-space: break-spaces;
+.required::after {
+  content: " *";
+  color: red;
 }
 
-.ps-menuitem-root .ps-submenu-root .ps-menu-label {
-  overflow: visible;
-  white-space: break-spaces;
-} */
+.dark .required::after {
+  color: #f3eeee; 
+}
+
