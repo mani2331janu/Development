@@ -6,8 +6,12 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import Select from "react-select";
+import api from "../../../../utils/api";
+import { notifySuccess } from "../../../../utils/notify";
 
 const EmployeeAdd = () => {
+  const api_url = import.meta.env.VITE_API_URL;
+
   const navigate = useNavigate();
   const [dob, setDob] = useState(null);
   const [previews, setPreviews] = useState({
@@ -129,16 +133,52 @@ const EmployeeAdd = () => {
     handleSubmit,
     formState: { errors },
     reset,
-    getValues
+    getValues,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues,
   });
 
   // ✅ Submit handler
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    alert("Form submitted successfully!");
+  const onSubmit = async (data) => {
+    try {
+      const formData = new FormData();
+
+      formData.append("first_name", data.first_name);
+      formData.append("last_name", data.last_name);
+      formData.append("gender", data.gender?.value);
+      formData.append("blood_group", data.blood_group?.value);
+      formData.append("employee_id", data.employee_id);
+      formData.append("email", data.email);
+      formData.append("mobile_no", data.mobile_no);
+      formData.append("emg_mobile_no", data.emg_mobile_no);
+      formData.append("address", data.address);
+      formData.append("city", data.city);
+      formData.append("pincode", data.pincode);
+      formData.append("bank_name", data.bank_name);
+      formData.append("account_number", data.account_number);
+      formData.append("ifsc_code", data.ifsc_code);
+
+      if (data.profile_image?.[0])
+        formData.append("profile_image", data.profile_image[0]);
+      if (data.id_proof?.[0]) formData.append("id_proof", data.id_proof[0]);
+      if (data.degree_certificate?.[0])
+        formData.append("degree_certificate", data.degree_certificate[0]);
+      if (data.experience_certificate?.[0])
+        formData.append(
+          "experience_certificate",
+          data.experience_certificate[0]
+        );
+
+      const res = await api.post(`${api_url}api/administration/employee/store`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      notifySuccess(res.data.message);
+      navigate(-1);
+    } catch (error) {
+      console.error("❌ Error uploading employee:", error);
+    }
   };
 
   // ✅ File Change Handler
@@ -183,7 +223,7 @@ const EmployeeAdd = () => {
           </div>
 
           {/* Employee ID */}
-          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">  
             <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Employee ID
             </label>

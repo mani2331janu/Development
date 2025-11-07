@@ -6,6 +6,7 @@ node_modules/
 
 # Package lock (ignore if you don't want to commit exact versions)
 package-lock.json
+uploads
 
 # Logs
 logs

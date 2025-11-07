@@ -30,7 +30,7 @@ const MedicalStore = async (req, res) => {
         .json({ success: false, message: "All fields are required" });
     }
 
-    const existsMedicalName = await Medical.findOne({
+    const existsMedicalName = await Medical.  ({
       location_id,
       medical_name: medical_name.trim(),
     });
