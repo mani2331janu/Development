@@ -9,6 +9,8 @@ router.get("/uploadlog/list", UploadLogController.uploadLogList);
 router.get("/uploadlog/view/:id", UploadLogController.getUploadLogView);
 router.post("/uploadlog/filterData", UploadLogController.getUploadFilterData);
 
+router.get("/employee/generate-id",EmployeeController.getPreviewEmployeeId)
+router.post("/employee/unique-check",EmployeeController.checkEmailUnique)
 router.get("/employee/list",EmployeeController.list)
 router.post("/employee/store",
   importHandler("image", "employee", [
@@ -19,5 +21,6 @@ router.post("/employee/store",
   ]),
   EmployeeController.Store
 );
+router.get("/employee/edit/:id",EmployeeController.Edit)
 
 module.exports = router;

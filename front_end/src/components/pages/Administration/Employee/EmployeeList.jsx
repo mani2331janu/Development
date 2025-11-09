@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import DataTable from "react-data-table-component";
+import DataTable, { createTheme } from "react-data-table-component";
 import { CiFilter } from "react-icons/ci";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
@@ -15,20 +15,33 @@ const EmployeeList = () => {
 
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const [showFilter, setShowFilter] = useState(false);
   const [employee, setEmployee] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
+  createTheme("darkCustom", {
+    text: { primary: "#f9fafb", secondary: "#d1d5db" },
+    background: { default: "#1f2937" },
+    context: { background: "#374151", text: "#FFFFFF" },
+    divider: { default: "#374151" },
+    highlightOnHover: { default: "#374151", text: "#f9fafb" },
+  });
 
   const handleFilter = () => setShowFilter((pre) => !pre);
   const getAllEmployee = async () => {
     try {
       const res = await api.get(`${api_url}api/administration/employee/list`);
       setEmployee(res.data);
-      console.log(res.data);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const columns = [
     { name: "#", cell: (row, index) => index + 1 },
+    {
+      name: "Employee ID",
+      selector: (row) => row.employee_id || "-",
+      sortable: true,
+    },
 
     {
       name: "Employee Name",
@@ -92,8 +105,8 @@ const EmployeeList = () => {
       ),
     },
     {
-        name:"Created By",
-        selector:(row) => row.created_by?.name
+      name: "Created By",
+      selector: (row) => row.created_by?.name,
     },
 
     {
@@ -166,7 +179,7 @@ const EmployeeList = () => {
       <div className="overflow-x-auto bg-white shadow-md border border-gray-200 rounded-xl">
         <DataTable
           columns={columns}
-          data={employee} 
+          data={employee}
           pagination
           highlightOnHover
           responsive

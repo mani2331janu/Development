@@ -52,4 +52,4 @@ const employeeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("master_employee", employeeSchema);
+module.exports = mongoose.model("master_employees", employeeSchema);

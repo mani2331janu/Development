@@ -66,7 +66,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
             <div className="w-9 h-9 rounded-full bg-indigo-500 dark:bg-gray-700 dark:text-white flex items-center justify-center text-white font-bold">
               {user?.name?.[0]?.toUpperCase()}
             </div>
-            <span className="hidden sm:inline text-gray-700 dark:text-black transition-colors duration-300 font-bold">
+            <span className="hidden sm:inline hover:text-white text-gray-700 dark:text-black transition-colors duration-300 font-bold">
               {user?.name}
             </span>
           </button>
@@ -76,13 +76,13 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
               <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
                 <li 
                   onClick={handleProfile}
-                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-300"
+                  className="font-bold bg-gray-200 m-2 dark:text-black rounded py-2 hover:bg-gray-300 hover:text-black dark:hover:text-white text-center dark:hover:bg-gray-700 cursor-pointer transition-colors duration-300"
                 >
                   Profile
                 </li>
                 <li
                   onClick={handleLogout}
-                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500 cursor-pointer transition-colors duration-300"
+                  className="font-bold bg-gray-200 m-2 dark:text-black rounded py-2 hover:bg-gray-300 hover:text-black text-center dark:hover:text-white dark:hover:bg-gray-700 cursor-pointer transition-colors duration-300"
                 >
                   Logout
                 </li>

@@ -25,6 +25,7 @@ import MedicalView from "./components/pages/Master/Medical/MedicalView";
 import MedicalEdit from "./components/pages/Master/Medical/MedicalEdit";
 import EmployeeList from "./components/pages/Administration/Employee/EmployeeList";
 import EmployeeAdd from "./components/pages/Administration/Employee/EmployeeAdd";
+import EmployeeEdit from "./components/pages/Administration/Employee/EmployeeEdit";
 
 export default function App() {
   return (
@@ -73,6 +74,8 @@ export default function App() {
                 <Route path="employee">
                   <Route path="list" element={<EmployeeList />} />
                   <Route path="add" element={<EmployeeAdd />} />
+                  <Route path="edit/:id" element={<EmployeeEdit />} />
+
                 </Route>
                 <Route path="upload-log">
                   <Route path="list" element={<UploadLogList />} />

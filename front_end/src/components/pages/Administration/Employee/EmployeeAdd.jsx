@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import Select from "react-select";
 import api from "../../../../utils/api";
 import { notifySuccess } from "../../../../utils/notify";
+import { useEffect } from "react";
 
 const EmployeeAdd = () => {
   const api_url = import.meta.env.VITE_API_URL;
@@ -20,8 +21,10 @@ const EmployeeAdd = () => {
     degree_certificate: null,
     experience_certificate: null,
   });
+  const [employeeId, setEmployeeId] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // ✅ Options
+
   const genderOption = [
     { value: 1, label: "Male" },
     { value: 2, label: "Female" },
@@ -61,7 +64,6 @@ const EmployeeAdd = () => {
   };
 
   const schema = Yup.object().shape({
-    employee_id: Yup.string().required("Employee ID is required"),
     first_name: Yup.string().required("First Name is required"),
     last_name: Yup.string().required("last Name is required"),
     gender: Yup.object().required("Gender is required"),
@@ -75,7 +77,23 @@ const EmployeeAdd = () => {
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
         "Invalid email format"
       )
-      .required("Email is required"),
+      .required("Email is required")
+      .test("email-unique", "Email Already Exists", async function (value) {
+        if (!value) return true;
+
+        try {
+          const data = { model: "Employee", field: "email", value };
+          const res = await api.post(
+            `${api_url}api/administration/employee/unique-check`,
+            data
+          );
+          return !res.data.exists;
+        } catch (err) {
+          console.error("Error checking unique email:", err);
+          return true;
+        }
+      }),
+
     emg_mobile_no: Yup.string()
       .matches(/^[0-9]{10}$/, "Enter valid 10-digit mobile number")
       .required("Mobile number is required"),
@@ -126,7 +144,6 @@ const EmployeeAdd = () => {
       }),
   });
 
-  // ✅ useForm setup
   const {
     register,
     control,
@@ -137,11 +154,13 @@ const EmployeeAdd = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues,
+    mode: "onBlur",
   });
 
   // ✅ Submit handler
   const onSubmit = async (data) => {
     try {
+      setLoading(true); 
       const formData = new FormData();
 
       formData.append("first_name", data.first_name);
@@ -170,9 +189,13 @@ const EmployeeAdd = () => {
           data.experience_certificate[0]
         );
 
-      const res = await api.post(`${api_url}api/administration/employee/store`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await api.post(
+        `${api_url}api/administration/employee/store`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       notifySuccess(res.data.message);
       navigate(-1);
@@ -199,6 +222,20 @@ const EmployeeAdd = () => {
     alert("Saved as draft without validation!");
   };
 
+  useEffect(() => {
+    const fetchEmployeeId = async () => {
+      try {
+        const res = await api.get(
+          `${api_url}api/administration/employee/generate-id`
+        );
+        setEmployeeId(res.data.employee_id);
+      } catch (error) {
+        console.error("Error generating employee ID", error);
+      }
+    };
+    fetchEmployeeId();
+  }, []);
+
   return (
     <div>
       <div className="flex justify-between">
@@ -223,24 +260,20 @@ const EmployeeAdd = () => {
           </div>
 
           {/* Employee ID */}
-          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">  
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
             <label className="required block text-gray-700 dark:text-white font-medium mb-2">
               Employee ID
             </label>
             <input
               type="text"
               {...register("employee_id")}
+              value={employeeId}
               className="border border-gray-400 dark:border-gray-600 
                bg-white dark:bg-gray-800 
                text-gray-900 dark:text-gray-200
                rounded w-full p-2 
                focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.employee_id && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
-                {errors.employee_id.message}
-              </p>
-            )}
           </div>
 
           {/* Name */}
@@ -696,28 +729,49 @@ const EmployeeAdd = () => {
 
         {/* Submit Button */}
         <div className="mt-4 flex justify-end px-2 gap-3">
-          {/* Save as Draft */}
           <button
             type="button"
-            onClick={() => {
-              handleSaveDraft();
-            }}
-            className="bg-yellow-600 text-white px-3 py-2 rounded 
-               hover:bg-yellow-800 font-semibold transition-colors"
+            onClick={handleSaveDraft}
+            disabled={loading}
+            className="bg-yellow-600 text-white px-3 py-2 rounded hover:bg-yellow-800 font-semibold transition-colors"
           >
             Save as Draft
           </button>
 
-          {/* Save */}
           <button
             type="submit"
-            className="bg-green-600 text-white px-3 py-2 rounded 
-               hover:bg-green-700 font-semibold transition-colors"
+            disabled={loading}
+            className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 font-semibold transition-colors flex items-center justify-center"
           >
-            Save
+            {loading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Saving...
+              </>
+            ) : (
+              "Save"
+            )}
           </button>
 
-          {/* Reset */}
           <button
             type="button"
             onClick={() => {
@@ -730,8 +784,8 @@ const EmployeeAdd = () => {
                 experience_certificate: null,
               });
             }}
-            className="bg-gray-500 text-white px-3 py-2 rounded 
-               hover:bg-gray-600 font-semibold transition-colors"
+            disabled={loading}
+            className="bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 font-semibold transition-colors"
           >
             Reset
           </button>
