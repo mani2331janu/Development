@@ -393,7 +393,7 @@ const EmployeeAdd = () => {
                 <img
                   src={previews.profile_image}
                   alt="Profile Preview"
-                  className="h-16 w-16 object-cover rounded-full border"
+                  className="h-16 w-16 object-cover rounded border dark:border-white"
                 />
               </div>
             )}
@@ -652,7 +652,7 @@ const EmployeeAdd = () => {
                 <img
                   src={previews.id_proof}
                   alt="ID Proof Preview"
-                  className="h-16 w-16 object-cover rounded border"
+                  className="h-16 w-16 object-cover rounded border dark:border-white"
                 />
               </div>
             )}
@@ -685,7 +685,7 @@ const EmployeeAdd = () => {
                 <img
                   src={previews.degree_certificate}
                   alt="Degree Preview"
-                  className="h-16 w-16 object-cover rounded border"
+                  className="h-16 w-16 object-cover rounded border dark:border-white"
                 />
               </div>
             )}
@@ -718,7 +718,7 @@ const EmployeeAdd = () => {
                 <img
                   src={previews.experience_certificate}
                   alt="Experience Preview"
-                  className="h-16 w-16 object-cover rounded border"
+                  className="h-16 w-16 object-cover rounded border dark:border-white"
                 />
               </div>
             )}

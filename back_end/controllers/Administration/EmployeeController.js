@@ -1,8 +1,8 @@
 const Employee = require("../../models/Administration/Employee");
 const Counter = require("../../models/Counter/Counter");
-const transporter = require("../../utils/mailer");
 const User = require("../../models/Auth/User");
-const models = {Employee}
+const agenda = require("../../config/agenda");
+const models = { Employee }
 
 const list = async (req, res) => {
   try {
@@ -57,26 +57,24 @@ const Store = async (req, res) => {
       experience_certificate,
       created_by: user_id,
     });
-
-    // Generate login credentials
+    
     const namePart = req.body.first_name
       ? req.body.first_name.substring(0, 4)
       : "User";
+    
     const tempPassword = `User@${namePart}${Math.floor(
       1000 + Math.random() * 9000
     )}`;
 
-    // Create user login
+    
     const user = await User.create({
       name: `${req.body.first_name} ${req.body.last_name}`,
       email: req.body.email,
       password: tempPassword,
     });
 
-    // Send email
-    await transporter.sendMail({
-      from: `"HR Team" <${process.env.FROM_EMAIL}>`,
-      to: req.body.email,
+    await agenda.now("sendEmployeeEmail", {
+      email: req.body.email,
       subject: "Your Employee Login Credentials",
       html: `
         <h3>Welcome to the Company!</h3>
@@ -96,21 +94,30 @@ const Store = async (req, res) => {
       data,
     });
   } catch (error) {
-    console.error("❌ Error saving employee:", error);
+    console.log("❌ Error saving employee:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
 
-const Edit = async(req,res) => {
+const Edit = async (req, res) => {
   try {
     const base_url = `${req.protocol}://${req.get("host")}`;
+    console.log(base_url);
     
-    const {id} = req.params;
-    const data = await Employee.findById({_id:id})
+
+    const { id } = req.params;
+    const data = await Employee.findById({ _id: id })
+    if(data.profile_image){
+      data.profile_image = `${base_url}${data.profile_image}`
+      
+    }
+
+    console.log(data.profile_image);
+    
 
     return res.status(200).json(data);
-   
-    
+
+
   } catch (error) {
     console.error("❌ Error saving employee:", error);
     res.status(500).json({ message: "Server Error" });
@@ -121,7 +128,7 @@ const getPreviewEmployeeId = async (req, res) => {
   try {
     const counter = await Counter.findById("employee");
 
-    const seq = counter ? counter.seq + 1 : 1; 
+    const seq = counter ? counter.seq + 1 : 1;
     const employeeId = `EMP-${String(seq).padStart(5, "0")}`;
 
     res.status(200).json({ employee_id: employeeId });
@@ -143,8 +150,6 @@ const getNextSequence = async (name) => {
 const checkEmailUnique = async (req, res) => {
   try {
     const { model, field, value } = req.body;
-    console.log(model, field, value);
-    
 
     if (!model || !field || !value) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -156,8 +161,6 @@ const checkEmailUnique = async (req, res) => {
     }
 
     const exists = await Model.exists({ [field]: value });
-    console.log(exists);
-    
     res.json({ exists: !!exists });
   } catch (err) {
     console.error(err);

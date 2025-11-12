@@ -11,11 +11,29 @@ const EmployeeEdit = () => {
   const api_url = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [previews, setPreviews] = useState({
+    profile_image: null,
+    id_proof: null,
+    degree_certificate: null,
+    experience_certificate: null,
+  });
 
   const genderOption = [
     { value: 1, label: "Male" },
     { value: 2, label: "Female" },
     { value: 3, label: "Others" },
+  ];
+
+  const bloodGroupOption = [
+    { value: "A+", label: "A+" },
+    { value: "A-", label: "A-" },
+    { value: "B+", label: "B+" },
+    { value: "B-", label: "B-" },
+    { value: "AB+", label: "AB+" },
+    { value: "AB-", label: "AB-" },
+    { value: "O+", label: "O+" },
+    { value: "O-", label: "O-" },
   ];
 
   // ✅ Validation Schema
@@ -41,10 +59,23 @@ const EmployeeEdit = () => {
         `${api_url}api/administration/employee/edit/${id}`
       );
       const employee = res.data;
+      console.log(employee);
+
       const selectedGender = genderOption.find(
         (opt) => opt.value === Number(employee.gender)
       );
-      reset({ ...employee, gender: selectedGender });
+      const selectedBloodGroup = bloodGroupOption.find(
+        (opt) => opt.value === employee.blood_group
+      )
+
+      if (employee.profile_image) {
+        setPreviews((pre) => ({
+          ...pre,
+          profile_image: employee.profile_image
+        }))
+      }
+
+      reset({ ...employee, gender: selectedGender, blood_group: selectedBloodGroup });
     } catch (err) {
       console.error("Error fetching employee:", err);
     }
@@ -170,6 +201,77 @@ const EmployeeEdit = () => {
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                 {errors.gender.message}
               </p>
+            )}
+          </div>
+
+          {/* Blood Group */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
+              Blood Group
+            </label>
+            <Controller
+              name="blood_group"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  options={bloodGroupOption}
+                  value={field.value}
+                  onChange={(selected) => field.onChange(selected)}
+                  placeholder="Select Blood Group"
+                />
+              )}
+            />
+            {errors.blood_group && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.blood_group.message}
+              </p>
+            )}
+          </div>
+
+          {/* Profile Image */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className=" required block text-gray-700 dark:text-white font-medium mb-2">
+              Profile Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              {...register("profile_image")}
+              onChange={(e) => {
+                handleFileChange(e, "profile_image");
+                register("profile_image").onChange(e);
+              }}
+              className="border border-gray-400 dark:border-gray-600 
+          bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200
+          rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.profile_image && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.profile_image.message}
+              </p>
+            )}
+            {previews.profile_image && (
+              <div className="mt-2">
+                <img
+                  src={previews.profile_image}
+                   onClick={() => setShowModal(true)}
+                  alt="Profile Preview"
+                  className="h-16 w-16 object-cover rounded border border dark:border-white"
+                />
+              </div>
+            )}
+            {showModal && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+                onClick={() => setShowModal(false)} // 👈 Hide on click
+              >
+                <img
+                  src={previews.profile_image}
+                  alt="Full Preview"
+                  className="max-w-[90vw] max-h-[90vh] rounded-lg"
+                />
+              </div>
             )}
           </div>
         </div>
