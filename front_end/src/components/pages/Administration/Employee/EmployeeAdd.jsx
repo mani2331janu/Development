@@ -82,7 +82,7 @@ const EmployeeAdd = () => {
         if (!value) return true;
 
         try {
-          const data = { model: "Employee", field: "email", value };
+          const data = { model: "Employee", field: "email", value, id: "" };
           const res = await api.post(
             `${api_url}api/administration/employee/unique-check`,
             data
@@ -160,7 +160,7 @@ const EmployeeAdd = () => {
   // ✅ Submit handler
   const onSubmit = async (data) => {
     try {
-      setLoading(true); 
+      setLoading(true);
       const formData = new FormData();
 
       formData.append("first_name", data.first_name);

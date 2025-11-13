@@ -5,13 +5,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import api from "../../../../utils/api";
 import Select from "react-select";
+import { notifySuccess } from "../../../../utils/notify";
 
 const EmployeeEdit = () => {
   const { id } = useParams();
   const api_url = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(null);
   const [previews, setPreviews] = useState({
     profile_image: null,
     id_proof: null,
@@ -36,10 +37,85 @@ const EmployeeEdit = () => {
     { value: "O-", label: "O-" },
   ];
 
-  // ✅ Validation Schema
   const schema = Yup.object().shape({
-    employee_id: Yup.string().required("Employee ID is required"),
     first_name: Yup.string().required("First Name is required"),
+    last_name: Yup.string().required("last Name is required"),
+    gender: Yup.object().required("Gender is required"),
+    blood_group: Yup.object().required("Blood group is required"),
+    mobile_no: Yup.string()
+      .matches(/^[0-9]{10}$/, "Enter valid 10-digit mobile number")
+      .required("Mobile number is required"),
+
+    email: Yup.string()
+      .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Invalid email format"
+      )
+      .required("Email is required")
+      .test("email-unique", "Email Already Exists", async function (value) {
+        if (!value) return true;
+
+        try {
+          const data = { model: "Employee", field: "email", value,id };
+          const res = await api.post(
+            `${api_url}api/administration/employee/unique-check`,
+            data
+          );
+          return !res.data.exists;
+        } catch (err) {
+          console.error("Error checking unique email:", err);
+          return true;
+        }
+      }),
+
+    emg_mobile_no: Yup.string()
+      .matches(/^[0-9]{10}$/, "Enter valid 10-digit mobile number")
+      .required("Mobile number is required"),
+    address: Yup.string().required("Address is required"),
+    city: Yup.string().required("City is Required"),
+    pincode: Yup.string()
+      .matches(/^[0-9]{6}$/, "Enter valid 6-digit pincode")
+      .required("Pincode is required"),
+
+    bank_name: Yup.string().required("Bank Name is required"),
+    account_number: Yup.string().required("Account Number is required"),
+    ifsc_code: Yup.string().required("IFSC Code is required"),
+    // id_proof: Yup.mixed()
+    //   .required("Id proof is required")
+    //   .test("fileType", "Only image files are allowed", (value) => {
+    //     return (
+    //       value &&
+    //       value[0] &&
+    //       ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
+    //     );
+    //   }),
+    // degree_certificate: Yup.mixed()
+    //   .required("Id proof is required")
+    //   .test("fileType", "Only image files are allowed", (value) => {
+    //     return (
+    //       value &&
+    //       value[0] &&
+    //       ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
+    //     );
+    //   }),
+    // experience_certificate: Yup.mixed()
+    //   .required("Id proof is required")
+    //   .test("fileType", "Only image files are allowed", (value) => {
+    //     return (
+    //       value &&
+    //       value[0] &&
+    //       ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
+    //     );
+    //   }),
+    // profile_image: Yup.mixed()
+    //   .required("Profile image is required")
+    //   .test("fileType", "Only image files are allowed", (value) => {
+    //     return (
+    //       value &&
+    //       value[0] &&
+    //       ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
+    //     );
+    //   }),
   });
 
   const {
@@ -60,6 +136,7 @@ const EmployeeEdit = () => {
       );
       const employee = res.data;
       console.log(employee);
+      
 
       const selectedGender = genderOption.find(
         (opt) => opt.value === Number(employee.gender)
@@ -74,6 +151,24 @@ const EmployeeEdit = () => {
           profile_image: employee.profile_image
         }))
       }
+      if (employee.id_proof) {
+        setPreviews((pre) => ({
+          ...pre,
+          id_proof: employee.id_proof
+        }))
+      }
+      if (employee.degree_certificate) {
+        setPreviews((pre) => ({
+          ...pre,
+          degree_certificate: employee.degree_certificate
+        }))
+      }
+      if (employee.experience_certificate) {
+        setPreviews((pre) => ({
+          ...pre,
+          experience_certificate: employee.experience_certificate
+        }))
+      }
 
       reset({ ...employee, gender: selectedGender, blood_group: selectedBloodGroup });
     } catch (err) {
@@ -85,22 +180,55 @@ const EmployeeEdit = () => {
     fetchEmployeeData();
   }, [id]);
 
+  const handleFileChange = (e, key) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviews((prev) => ({
+          ...prev,
+          [key]: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // ✅ Submit Handler
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const res = await api.put(
+
+      const formData = new FormData();
+
+      for (const key in data) {
+        if (key === "gender") {
+          formData.append(key, data[key]?.value || "");
+        } else if (key === "blood_group") {
+          formData.append(key, data[key]?.value || "");
+        } else if (data[key] instanceof FileList) {
+          if (data[key][0]) formData.append(key, data[key][0]);
+        } else {
+          formData.append(key, data[key]);
+        }
+      }
+
+      const res = await api.post(
         `${api_url}api/administration/employee/update/${id}`,
-        data
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
-      console.log("Updated:", res.data);
-      navigate("/employee");
+      notifySuccess(res.data.message)
+      navigate(-1);
     } catch (err) {
       console.error("Update error:", err);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div>
@@ -255,7 +383,7 @@ const EmployeeEdit = () => {
               <div className="mt-2">
                 <img
                   src={previews.profile_image}
-                   onClick={() => setShowModal(true)}
+                  onClick={() => setShowModal("profile_image")}
                   alt="Profile Preview"
                   className="h-16 w-16 object-cover rounded border border dark:border-white"
                 />
@@ -264,16 +392,382 @@ const EmployeeEdit = () => {
             {showModal && (
               <div
                 className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
-                onClick={() => setShowModal(false)} // 👈 Hide on click
+                onClick={() => setShowModal(null)} // 👈 Hide on click
               >
                 <img
-                  src={previews.profile_image}
+                  src={previews[showModal]}
+                  alt="Full Preview"
+                  className="w-50px h-50px rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="w-full font-bold text-white mt-3 px-4 py-2 rounded-md bg-blue-700 dark:bg-gray-600 border border-blue-800 dark:border-gray-700 shadow-sm">
+            Contact Information
+          </div>
+
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
+            <label
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+              htmlFor="mobile_no"
+            >
+              Email
+            </label>
+            <input
+              {...register("email")}
+              placeholder="Enter Email ID..."
+              className="border border-gray-400 dark:border-gray-600 
+                   rounded bg-white dark:bg-gray-800 text-gray-900
+                   dark:text-gray-200 w-full p-2
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+            />
+            {errors.email && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+          {/* Mobile */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
+            <label
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+              htmlFor="mobile_no"
+            >
+              Mobile No
+            </label>
+            <input
+              {...register("mobile_no")}
+              placeholder="Enter Mobile no..."
+              className="border border-gray-400 dark:border-gray-600 
+                   rounded bg-white dark:bg-gray-800 text-gray-900
+                   dark:text-gray-200 w-full p-2
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+            />
+            {errors.mobile_no && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.mobile_no.message}
+              </p>
+            )}
+          </div>
+
+          {/* emg contact no */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
+            <label
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+              htmlFor="emg_mobile_no"
+            >
+              Emergency Contact Number
+            </label>
+            <input
+              {...register("emg_mobile_no")}
+              placeholder="Enter Emergency Num...."
+              className="border border-gray-400 dark:border-gray-600 
+                   rounded bg-white dark:bg-gray-800 text-gray-900
+                   dark:text-gray-200 w-full p-2
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+            />
+            {errors.emg_mobile_no && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.emg_mobile_no.message}
+              </p>
+            )}
+          </div>
+
+          {/* address */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+              htmlFor="address"
+            >
+              Address
+            </label>
+            <textarea
+              {...register("address")}
+              placeholder="Enter address"
+              className="border border-gray-400 dark:border-gray-600 
+           rounded bg-white dark:bg-gray-800 text-gray-900
+           dark:text-gray-200 w-full p-2
+           focus:outline-none focus:ring-2 focus:ring-blue-500
+           resize-none h-24"
+            ></textarea>
+            {errors.address && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.address.message}
+              </p>
+            )}
+          </div>
+
+          {/* city */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
+            <label
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+              htmlFor="city"
+            >
+              City
+            </label>
+            <input
+              {...register("city")}
+              placeholder="Enter City...."
+              className="border border-gray-400 dark:border-gray-600 
+                   rounded bg-white dark:bg-gray-800 text-gray-900
+                   dark:text-gray-200 w-full p-2
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+            />
+            {errors.city && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.city.message}
+              </p>
+            )}
+          </div>
+
+          {/* pincode */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2  ">
+            <label
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+              htmlFor="pincode"
+            >
+              Pincode
+            </label>
+            <input
+              {...register("pincode")}
+              placeholder="Enter Pincode...."
+              className="border border-gray-400 dark:border-gray-600 
+                   rounded bg-white dark:bg-gray-800 text-gray-900
+                   dark:text-gray-200 w-full p-2
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+            />
+            {errors.pincode && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.pincode.message}
+              </p>
+            )}
+          </div>
+
+          <div className="w-full font-bold text-white mt-3 px-4 py-2 rounded-md bg-blue-700 dark:bg-gray-600 border border-blue-800 dark:border-gray-700 shadow-sm">
+            Bank Details
+          </div>
+
+          {/* bankname */}
+          <div className="w-full sm:w-1/3 lg:w-1/3 mt-3 px-2">
+            <label
+              htmlFor="bank_name"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+            >
+              Bank Name
+            </label>
+            <input
+              type="text"
+              {...register("bank_name")}
+              placeholder="Enter Your Bank Name..."
+              className="border border-gray-400 dark:border-gray-600 
+                rounded bg-white dark:bg-gray-800 text-gray-900
+                dark:text-gray-200 w-full p-2 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 "
+            />
+            {errors.bank_name && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.bank_name.message}
+              </p>
+            )}
+          </div>
+
+          {/* Account Number */}
+          <div className="w-full sm:w-1/3 lg:w-1/3 mt-3 px-2">
+            <label
+              htmlFor="account_number"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+            >
+              Account Number
+            </label>
+            <input
+              type="text"
+              {...register("account_number")}
+              placeholder="Enter Account Number..."
+              className="border border-gray-400 dark:border-gray-600 
+                rounded bg-white dark:bg-gray-800 text-gray-900
+                dark:text-gray-200 w-full p-2 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 "
+            />
+            {errors.account_number && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.account_number.message}
+              </p>
+            )}
+          </div>
+
+          {/* iffs code */}
+          <div className="w-full sm:w-1/3 lg:w-1/3 mt-3 px-2">
+            <label
+              htmlFor="ifsc_code"
+              className="required block text-gray-700 dark:text-white font-medium mb-2"
+            >
+              IFSC Code
+            </label>
+            <input
+              type="text"
+              {...register("ifsc_code")}
+              placeholder="Enter IFSC Code..."
+              className="border border-gray-400 dark:border-gray-600 
+                rounded bg-white dark:bg-gray-800 text-gray-900
+                dark:text-gray-200 w-full p-2 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 "
+            />
+            {errors.ifsc_code && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.ifsc_code.message}
+              </p>
+            )}
+          </div>
+
+          <div className="w-full font-bold text-white mt-3 px-4 py-2 rounded-md bg-blue-700 dark:bg-gray-600 border border-blue-800 dark:border-gray-700 shadow-sm">
+            Documents
+          </div>
+
+          {/* Id Proof */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className=" required block text-gray-700 dark:text-white font-medium mb-2">
+              ID Proof
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              {...register("id_proof")}
+              onChange={(e) => {
+                handleFileChange(e, "id_proof");
+                register("id_proof").onChange(e);
+              }}
+              className="border border-gray-400 dark:border-gray-600 
+          bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200
+          rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.id_proof && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.id_proof.message}
+              </p>
+            )}
+            {previews.id_proof && (
+              <div className="mt-2">
+                <img
+                  src={previews.id_proof}
+                  onClick={() => setShowModal("id_proof")}
+                  alt="Profile Preview"
+                  className="h-16 w-16 object-cover rounded border border dark:border-white"
+                />
+              </div>
+            )}
+            {showModal && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+                onClick={() => setShowModal(null)} // 👈 Hide on click
+              >
+                <img
+                  src={previews[showModal]}
                   alt="Full Preview"
                   className="max-w-[90vw] max-h-[90vh] rounded-lg"
                 />
               </div>
             )}
           </div>
+
+          {/* Degree Certificate */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className=" required block text-gray-700 dark:text-white font-medium mb-2">
+              Degree Certificate
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              {...register("degree_certificate")}
+              onChange={(e) => {
+                handleFileChange(e, "degree_certificate");
+                register("degree_certificate").onChange(e);
+              }}
+              className="border border-gray-400 dark:border-gray-600 
+          bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200
+          rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.degree_certificate && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.degree_certificate.message}
+              </p>
+            )}
+            {previews.degree_certificate && (
+              <div className="mt-2">
+                <img
+                  src={previews.degree_certificate}
+                  onClick={() => setShowModal("degree_certificate")}
+                  alt="Profile Preview"
+                  className="h-16 w-16 object-cover rounded border border dark:border-white"
+                />
+              </div>
+            )}
+            {showModal && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+                onClick={() => setShowModal(null)} // 👈 Hide on click
+              >
+                <img
+                  src={previews[showModal]}
+                  alt="Full Preview"
+                  className="max-w-[90vw] max-h-[90vh] rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+
+          {/*Experience Certificate */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className=" required block text-gray-700 dark:text-white font-medium mb-2">
+              Experience Certificate
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              {...register("experience_certificate")}
+              onChange={(e) => {
+                handleFileChange(e, "experience_certificate");
+                register("experience_certificate").onChange(e);
+              }}
+              className="border border-gray-400 dark:border-gray-600 
+          bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200
+          rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.experience_certificate && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.experience_certificate.message}
+              </p>
+            )}
+            {previews.experience_certificate && (
+              <div className="mt-2">
+                <img
+                  src={previews.experience_certificate}
+                  onClick={() => setShowModal("experience_certificate")}
+                  alt="Profile Preview"
+                  className="h-16 w-16 object-cover rounded border border dark:border-white"
+                />
+              </div>
+            )}
+            {showModal && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+                onClick={() => setShowModal(null)} // 👈 Hide on click
+              >
+                <img
+                  src={previews[showModal]}
+                  alt="Full Preview"
+                  className="max-w-[90vw] max-h-[90vh] rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+
+
         </div>
 
         <hr className="mt-4 border-gray-400 dark:border-gray-600" />

@@ -68,10 +68,12 @@ const importHandler = (type, moduleName, fields = []) => {
         if (type === "image" && req.files) {
           req.importedFiles = {};
           for (const field in req.files) {
-            req.importedFiles[field] = req.files[field][0].path;
+            const normalizedPath = req.files[field][0].path.replace(/\\/g, "/");
+            req.importedFiles[field] = normalizedPath.startsWith("/")
+              ? normalizedPath
+              : "/" + normalizedPath;
           }
         }
-
         next();
       } catch (error) {
         console.error("Upload error:", error);

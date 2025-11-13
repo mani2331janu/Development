@@ -3,6 +3,11 @@ const Counter = require("../../models/Counter/Counter");
 const User = require("../../models/Auth/User");
 const agenda = require("../../config/agenda");
 const models = { Employee }
+const fs = require("fs");
+const { normalizePath } = require("../../utils/helper");
+const path = require("path");
+const mongoose = require("mongoose");
+
 
 const list = async (req, res) => {
   try {
@@ -57,16 +62,16 @@ const Store = async (req, res) => {
       experience_certificate,
       created_by: user_id,
     });
-    
+
     const namePart = req.body.first_name
       ? req.body.first_name.substring(0, 4)
       : "User";
-    
+
     const tempPassword = `User@${namePart}${Math.floor(
       1000 + Math.random() * 9000
     )}`;
 
-    
+
     const user = await User.create({
       name: `${req.body.first_name} ${req.body.last_name}`,
       email: req.body.email,
@@ -102,18 +107,24 @@ const Store = async (req, res) => {
 const Edit = async (req, res) => {
   try {
     const base_url = `${req.protocol}://${req.get("host")}`;
-    console.log(base_url);
-    
 
     const { id } = req.params;
     const data = await Employee.findById({ _id: id })
-    if(data.profile_image){
+
+    if (data.profile_image) {
       data.profile_image = `${base_url}${data.profile_image}`
-      
     }
 
-    console.log(data.profile_image);
-    
+    if (data.id_proof) {
+      data.id_proof = `${base_url}${data.id_proof}`
+    }
+    if (data.degree_certificate) {
+      data.degree_certificate = `${base_url}${data.degree_certificate}`
+    }
+    if (data.experience_certificate) {
+      data.experience_certificate = `${base_url}${data.experience_certificate}`
+    }
+
 
     return res.status(200).json(data);
 
@@ -123,6 +134,132 @@ const Edit = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 }
+
+const Update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user?.id || null;
+
+    const {
+      first_name,
+      last_name,
+      email,
+      mobile_no,
+      gender,
+      blood_group,
+      address,
+      bank_name,
+      ifsc_code,
+      account_number,
+      updated_by,
+    } = req.body;
+
+
+    const employee = await Employee.findById(id);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    const uploadedFiles = req.importedFiles || {};
+    console.log(uploadedFiles, employee.profile_image);
+
+
+    const deleteOldFile = (filePath) => {
+      const absolutePath = path.join(process.cwd(), filePath.replace(/^\//, ""));
+      if (fs.existsSync(absolutePath)) {
+        try {
+          fs.unlinkSync(absolutePath);
+        } catch (err) {
+          console.warn(" Failed to delete old file:", err);
+        }
+      } else {
+        console.warn("File not found for deletion:", absolutePath);
+      }
+    };
+
+    if (uploadedFiles.profile_image) deleteOldFile(employee.profile_image);
+    if (uploadedFiles.id_proof) deleteOldFile(employee.id_proof);
+    if (uploadedFiles.degree_certificate)
+      deleteOldFile(employee.degree_certificate);
+    if (uploadedFiles.experience_certificate)
+      deleteOldFile(employee.experience_certificate);
+
+    const updatedData = await Employee.findByIdAndUpdate(
+      id,
+      {
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        mobile_no: mobile_no,
+        gender: gender,
+        blood_group: blood_group,
+        address: address,
+        bank_name: bank_name,
+        ifsc_code: ifsc_code,
+        account_number: account_number,
+        profile_image:
+          normalizePath(uploadedFiles.profile_image || employee.profile_image),
+        id_proof: normalizePath(uploadedFiles.id_proof || employee.id_proof),
+        degree_certificate:
+          normalizePath(uploadedFiles.degree_certificate || employee.degree_certificate),
+        experience_certificate:
+          normalizePath(uploadedFiles.experience_certificate || employee.experience_certificate),
+        updated_by: (user_id),
+        updatedAt: new Date(),
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Employee updated successfully",
+      data: updatedData,
+    });
+  } catch (error) {
+    console.error("Employee update error:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+const View = async (req, res) => {
+  try {
+    const base_url = `${req.protocol}://${req.host}`;
+    const { id } = req.params;
+
+    const data = await Employee.findById({ _id: id }).populate({
+      path: "created_by",
+      name: "name"
+    }).populate({
+      path: "updated_by",
+      name: "name"
+    });
+
+    if (data.profile_image) {
+      data.profile_image = `${base_url}${data.profile_image}`
+    }
+
+    if (data.id_proof) {
+      data.id_proof = `${base_url}${data.id_proof}`
+    }
+    if (data.degree_certificate) {
+      data.degree_certificate = `${base_url}${data.degree_certificate}`
+    }
+    if (data.experience_certificate) {
+      data.experience_certificate = `${base_url}${data.experience_certificate}`
+    }
+
+    return res.status(200).json(data);
+
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server Error" });
+
+  }
+}
+
 
 const getPreviewEmployeeId = async (req, res) => {
   try {
@@ -147,9 +284,12 @@ const getNextSequence = async (name) => {
   return counter.seq;
 };
 
+
 const checkEmailUnique = async (req, res) => {
   try {
-    const { model, field, value } = req.body;
+    const { model, field, value, id } = req.body;
+    console.log(model);
+
 
     if (!model || !field || !value) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -160,10 +300,16 @@ const checkEmailUnique = async (req, res) => {
       return res.status(400).json({ message: "Invalid model" });
     }
 
-    const exists = await Model.exists({ [field]: value });
+    let query = { [field]: value };
+
+    if (id) {
+      query._id = { $ne: id };
+    }
+
+    const exists = await Model.exists(query);
     res.json({ exists: !!exists });
   } catch (err) {
-    console.error(err);
+    console.error("Unique check error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -174,4 +320,6 @@ module.exports = {
   Edit,
   getPreviewEmployeeId,
   checkEmailUnique,
+  Update,
+  View,
 };
