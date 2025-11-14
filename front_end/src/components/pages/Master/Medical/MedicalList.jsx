@@ -34,7 +34,6 @@ const MedicalList = () => {
     defaultValues,
   });
 
-
   const selectedLocation = watch("location_id");
 
   // Fetch  medical

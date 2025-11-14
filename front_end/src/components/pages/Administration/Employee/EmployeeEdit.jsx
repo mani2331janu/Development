@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import api from "../../../../utils/api";
 import Select from "react-select";
 import { notifySuccess } from "../../../../utils/notify";
+import { BLOOD_GROUP, Gender } from "../../../../constant/constant";
 
 const EmployeeEdit = () => {
   const { id } = useParams();
@@ -21,20 +22,20 @@ const EmployeeEdit = () => {
   });
 
   const genderOption = [
-    { value: 1, label: "Male" },
-    { value: 2, label: "Female" },
-    { value: 3, label: "Others" },
+    { value: Gender.MALE, label: "Male" },
+    { value: Gender.FEMALE, label: "Female" },
+    { value: Gender.OTHERS, label: "Others" },
   ];
 
   const bloodGroupOption = [
-    { value: "A+", label: "A+" },
-    { value: "A-", label: "A-" },
-    { value: "B+", label: "B+" },
-    { value: "B-", label: "B-" },
-    { value: "AB+", label: "AB+" },
-    { value: "AB-", label: "AB-" },
-    { value: "O+", label: "O+" },
-    { value: "O-", label: "O-" },
+    { value: BLOOD_GROUP.A_POS, label: "A+" },
+    { value: BLOOD_GROUP.A_NEG, label: "A-" },
+    { value: BLOOD_GROUP.B_POS, label: "B+" },
+    { value: BLOOD_GROUP.B_NEG, label: "B-" },
+    { value: BLOOD_GROUP.AB_POS, label: "AB+" },
+    { value: BLOOD_GROUP.AB_NEG, label: "AB-" },
+    { value: BLOOD_GROUP.O_POS, label: "O+" },
+    { value: BLOOD_GROUP.O_NEG, label: "O-" },
   ];
 
   const schema = Yup.object().shape({
@@ -56,7 +57,7 @@ const EmployeeEdit = () => {
         if (!value) return true;
 
         try {
-          const data = { model: "Employee", field: "email", value,id };
+          const data = { model: "Employee", field: "email", value, id };
           const res = await api.post(
             `${api_url}api/administration/employee/unique-check`,
             data
@@ -136,13 +137,13 @@ const EmployeeEdit = () => {
       );
       const employee = res.data;
       console.log(employee);
-      
+
 
       const selectedGender = genderOption.find(
         (opt) => opt.value === Number(employee.gender)
       );
       const selectedBloodGroup = bloodGroupOption.find(
-        (opt) => opt.value === employee.blood_group
+        (opt) => opt.value === Number(employee.blood_group)
       )
 
       if (employee.profile_image) {
@@ -397,7 +398,7 @@ const EmployeeEdit = () => {
                 <img
                   src={previews[showModal]}
                   alt="Full Preview"
-                  className="w-50px h-50px rounded-lg"
+                  className="w-[400px] h-[400px] rounded-lg"
                 />
               </div>
             )}
@@ -669,7 +670,7 @@ const EmployeeEdit = () => {
                 <img
                   src={previews[showModal]}
                   alt="Full Preview"
-                  className="max-w-[90vw] max-h-[90vh] rounded-lg"
+                  className="w-[400px] h-[400px] rounded-lg"
                 />
               </div>
             )}
@@ -715,7 +716,7 @@ const EmployeeEdit = () => {
                 <img
                   src={previews[showModal]}
                   alt="Full Preview"
-                  className="max-w-[90vw] max-h-[90vh] rounded-lg"
+                  className="w-[400px] h-[400px] rounded-lg"
                 />
               </div>
             )}
@@ -761,7 +762,7 @@ const EmployeeEdit = () => {
                 <img
                   src={previews[showModal]}
                   alt="Full Preview"
-                  className="max-w-[90vw] max-h-[90vh] rounded-lg"
+                  className="w-[400px] h-[400px] rounded-lg"
                 />
               </div>
             )}

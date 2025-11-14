@@ -2,32 +2,38 @@ const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema(
   {
-    employee_id: { type: String, required: true, unique: true },
-    first_name: { type: String, required: true },
-    last_name: { type: String, required: true },
-    gender: { type: String, required: true },
-    blood_group: { type: String, required: true },
+    login_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    employee_id: { type: String, default: null, unique: true },
+    first_name: { type: String, default: null },
+    last_name: { type: String, default: null },
+    gender: { type: String, default: null },
+    blood_group: { type: String, default: null },
 
     // Contact Info
-    email: { type: String, required: true },
-    mobile_no: { type: String, required: true },
-    emg_mobile_no: { type: String, required: true },
+    email: { type: String, default: null },
+    mobile_no: { type: String, default: null },
+    emg_mobile_no: { type: String, default: null },
 
     // Address Info
-    address: { type: String, required: true },
-    city: { type: String, required: true },
-    pincode: { type: String, required: true },
+    address: { type: String, default: null },
+    city: { type: String, default: null },
+    pincode: { type: String, default: null },
 
     // Bank Details
-    bank_name: { type: String, required: true },
-    account_number: { type: String, required: true },
-    ifsc_code: { type: String, required: true },
+    bank_name: { type: String, default: null },
+    account_number: { type: String, default: null },
+    ifsc_code: { type: String, default: null },
 
     // Optional File Uploads
-    profile_image: { type: String },
-    id_proof: { type: String },
-    degree_certificate: { type: String },
-    experience_certificate: { type: String },
+    profile_image: { type: String, default: null },
+    id_proof: { type: String, default: null },
+    degree_certificate: { type: String, default: null },
+    experience_certificate: { type: String, default: null },
+
     created_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

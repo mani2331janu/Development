@@ -9,6 +9,7 @@ import Select from "react-select";
 import api from "../../../../utils/api";
 import { notifySuccess } from "../../../../utils/notify";
 import { useEffect } from "react";
+import { BLOOD_GROUP, Gender } from "../../../../constant/constant";
 
 const EmployeeAdd = () => {
   const api_url = import.meta.env.VITE_API_URL;
@@ -26,21 +27,22 @@ const EmployeeAdd = () => {
 
 
   const genderOption = [
-    { value: 1, label: "Male" },
-    { value: 2, label: "Female" },
-    { value: 3, label: "Others" },
+    { value: Gender.MALE, label: "Male" },
+    { value: Gender.FEMALE, label: "Female" },
+    { value: Gender.OTHERS, label: "Others" },
   ];
 
   const bloodGroupOption = [
-    { value: "A+", label: "A+" },
-    { value: "A-", label: "A-" },
-    { value: "B+", label: "B+" },
-    { value: "B-", label: "B-" },
-    { value: "AB+", label: "AB+" },
-    { value: "AB-", label: "AB-" },
-    { value: "O+", label: "O+" },
-    { value: "O-", label: "O-" },
+    { value: BLOOD_GROUP.A_POS, label: "A+" },
+    { value: BLOOD_GROUP.A_NEG, label: "A-" },
+    { value: BLOOD_GROUP.B_POS, label: "B+" },
+    { value: BLOOD_GROUP.B_NEG, label: "B-" },
+    { value: BLOOD_GROUP.AB_POS, label: "AB+" },
+    { value: BLOOD_GROUP.AB_NEG, label: "AB-" },
+    { value: BLOOD_GROUP.O_POS, label: "O+" },
+    { value: BLOOD_GROUP.O_NEG, label: "O-" },
   ];
+
 
   const defaultValues = {
     first_name: "",
@@ -160,6 +162,8 @@ const EmployeeAdd = () => {
   // ✅ Submit handler
   const onSubmit = async (data) => {
     try {
+      console.log(data);
+
       setLoading(true);
       const formData = new FormData();
 

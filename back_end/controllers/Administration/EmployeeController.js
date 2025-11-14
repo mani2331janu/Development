@@ -7,14 +7,17 @@ const fs = require("fs");
 const { normalizePath } = require("../../utils/helper");
 const path = require("path");
 const mongoose = require("mongoose");
+const { updateNextSequence } = require("../../utils/counterHelper");
 
 
 const list = async (req, res) => {
   try {
-    const data = await Employee.find().populate({
+    const data = await Employee.find({ trash: "No" }).populate({
       path: "created_by",
-      select: "name",
-    });
+      select: "first_name",
+    }).sort({ _id: -1 });
+    console.log(data);
+
     return res.status(200).json(data);
   } catch (error) {
     console.log(error);
@@ -25,23 +28,30 @@ const list = async (req, res) => {
 const Store = async (req, res) => {
   try {
     const user_id = req.user?.id || null;
-    const nextSeq = await getNextSequence("employee");
+    const nextSeq = await updateNextSequence("employee");
     const employeeId = `EMP-${String(nextSeq).padStart(5, "0")}`;
 
-    const profile_image = req.files["profile_image"]
-      ? `/uploads/employee/${req.files["profile_image"][0].filename}`
-      : null;
-    const id_proof = req.files["id_proof"]
-      ? `/uploads/employee/${req.files["id_proof"][0].filename}`
-      : null;
-    const degree_certificate = req.files["degree_certificate"]
-      ? `/uploads/employee/${req.files["degree_certificate"][0].filename}`
-      : null;
-    const experience_certificate = req.files["experience_certificate"]
-      ? `/uploads/employee/${req.files["experience_certificate"][0].filename}`
-      : null;
+    // Generate temporary password
+    const namePart = req.body.first_name ? req.body.first_name.substring(0, 4) : "User";
+    const tempPassword = `User@${namePart}${Math.floor(1000 + Math.random() * 9000)}`;
 
+    // Create User first
+    const user = await User.create({
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      email: req.body.email,
+      password: tempPassword,
+    });
+
+    // File uploads
+    const profile_image = req.files?.profile_image ? `/uploads/employee/${req.files.profile_image[0].filename}` : null;
+    const id_proof = req.files?.id_proof ? `/uploads/employee/${req.files.id_proof[0].filename}` : null;
+    const degree_certificate = req.files?.degree_certificate ? `/uploads/employee/${req.files.degree_certificate[0].filename}` : null;
+    const experience_certificate = req.files?.experience_certificate ? `/uploads/employee/${req.files.experience_certificate[0].filename}` : null;
+
+    // Create Employee with login_id from User
     const data = await Employee.create({
+      login_id: user._id,
       employee_id: employeeId,
       first_name: req.body.first_name,
       last_name: req.body.last_name,
@@ -63,21 +73,7 @@ const Store = async (req, res) => {
       created_by: user_id,
     });
 
-    const namePart = req.body.first_name
-      ? req.body.first_name.substring(0, 4)
-      : "User";
-
-    const tempPassword = `User@${namePart}${Math.floor(
-      1000 + Math.random() * 9000
-    )}`;
-
-
-    const user = await User.create({
-      name: `${req.body.first_name} ${req.body.last_name}`,
-      email: req.body.email,
-      password: tempPassword,
-    });
-
+    // Send email
     await agenda.now("sendEmployeeEmail", {
       email: req.body.email,
       subject: "Your Employee Login Credentials",
@@ -103,6 +99,7 @@ const Store = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 const Edit = async (req, res) => {
   try {
@@ -151,8 +148,13 @@ const Update = async (req, res) => {
       bank_name,
       ifsc_code,
       account_number,
-      updated_by,
+      city,
+      pincode,
+      emg_mobile_no,
+
     } = req.body;
+
+
 
 
     const employee = await Employee.findById(id);
@@ -165,12 +167,13 @@ const Update = async (req, res) => {
 
 
     const deleteOldFile = (filePath) => {
+      if (!filePath) return; // skip if null or undefined
       const absolutePath = path.join(process.cwd(), filePath.replace(/^\//, ""));
       if (fs.existsSync(absolutePath)) {
         try {
           fs.unlinkSync(absolutePath);
         } catch (err) {
-          console.warn(" Failed to delete old file:", err);
+          console.warn("Failed to delete old file:", err);
         }
       } else {
         console.warn("File not found for deletion:", absolutePath);
@@ -197,6 +200,9 @@ const Update = async (req, res) => {
         bank_name: bank_name,
         ifsc_code: ifsc_code,
         account_number: account_number,
+        city: city,
+        pincode: pincode,
+        emg_mobile_no: emg_mobile_no,
         profile_image:
           normalizePath(uploadedFiles.profile_image || employee.profile_image),
         id_proof: normalizePath(uploadedFiles.id_proof || employee.id_proof),
@@ -230,10 +236,10 @@ const View = async (req, res) => {
 
     const data = await Employee.findById({ _id: id }).populate({
       path: "created_by",
-      name: "name"
+      name: "first_name"
     }).populate({
       path: "updated_by",
-      name: "name"
+      name: "first_name"
     });
 
     if (data.profile_image) {
@@ -275,14 +281,61 @@ const getPreviewEmployeeId = async (req, res) => {
   }
 };
 
-const getNextSequence = async (name) => {
-  const counter = await Counter.findByIdAndUpdate(
-    { _id: name },
-    { $inc: { seq: 1 } },
-    { new: true, upsert: true }
-  );
-  return counter.seq;
-};
+const StatusChange = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const data = await Employee.updateOne(
+      { _id: id },
+      { $set: { status } }
+    );
+
+    if (data.modifiedCount > 0) {
+      return res.status(200).json({ success: true, message: "Employee  Status Changed Successfully" });
+    } else {
+      return res.status(404).json({ success: false, message: "Medical not found or status already set" });
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+
+  }
+}
+
+const employeeDelete = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await Employee.updateOne(
+      { _id: id },
+      { $set: { status: 0, trash: "Yes" } }
+    );
+
+    if (data) {
+      return res.status(200).json({ success: true, message: "Employee Data Delete Successfully" })
+    } else {
+      return res.status(404).json({ success: false, message: "Employee not found or status already set" });
+    }
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server Error" })
+
+  }
+}
+
+const filterData = async (req, res) => {
+  try {
+    const { emp_id } = req.body;
+    const data = await Employee.findById({ _id: emp_id }).populate({ path: "created_by", name: "first_name" })
+    return res.status(200).json({ success: true, data });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server Error" })
+  }
+}
+
 
 
 const checkEmailUnique = async (req, res) => {
@@ -322,4 +375,7 @@ module.exports = {
   checkEmailUnique,
   Update,
   View,
+  StatusChange,
+  employeeDelete,
+  filterData
 };

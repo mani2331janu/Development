@@ -1,6 +1,7 @@
 import React from "react";
 // utils/formatDate.js
 import dayjs from "dayjs";
+import { BLOOD_GROUP, Gender } from "../constant/constant";
 
 export const displayDateFormat = (date) => {
     return date ? dayjs(date).format("DD-MM-YYYY") : "";
@@ -38,14 +39,53 @@ export const getUploadLogStatus = (status) => {
 };
 
 export const displayStatus = (status) => {
-  switch (Number(status)) {
-    case 1:
-      return "Active";
-    case 0:
-      return "Inactive"; 
-    default:
-      return "Unknown";
-  }
+    switch (Number(status)) {
+        case 1:
+            return "Active";
+        case 0:
+            return "Inactive";
+        default:
+            return "Unknown";
+    }
 };
+
+export const getBloodGroup = (value) => {
+    value = Number(value);
+    switch (value) {
+        case BLOOD_GROUP.A_POS:
+            return "A+";
+        case BLOOD_GROUP.A_NEG:
+            return "A-";
+        case BLOOD_GROUP.B_POS:
+            return "B+";
+        case BLOOD_GROUP.B_NEG:
+            return "B-";
+        case BLOOD_GROUP.AB_POS:
+            return "AB+";
+        case BLOOD_GROUP.AB_NEG:
+            return "AB-";
+        case BLOOD_GROUP.O_POS:
+            return "O+";
+        case BLOOD_GROUP.O_NEG:
+            return "O-";
+        default:
+            return "-";
+    }
+}
+
+export const getGender = (value) => {
+    value = Number(value);
+    switch (value) {
+        case Gender.MALE:
+            return "Male";
+        case Gender.FEMALE:
+            return "Female";
+        case Gender.OTHERS:
+            return "Others";
+        default:
+            return "-";
+    }
+}
+
 
 

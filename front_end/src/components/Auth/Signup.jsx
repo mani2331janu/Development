@@ -15,7 +15,8 @@ const Signup = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const schema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
+    first_name: Yup.string().required("First Name is required"),
+    last_name: Yup.string().required("Last Name is required"),
     email: Yup.string().required("Email is required").matches(/^[a-zA-Z0-9._]+@[a-zA-Z0-9.-]{3,15}\.[a-zA-Z]{2,4}$/, "Enter Valid Email"),
     password: Yup.string()
       .required("Password is required")
@@ -65,15 +66,28 @@ const Signup = () => {
           <h2 className="text-3xl font-bold text-center">Sign Up</h2>
 
           <div>
-            <label className="block text-gray-700 mb-2">Name</label>
+            <label className="block text-gray-700 mb-2">First Name</label>
             <input
               type="text"
-              {...register("name")}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.name ? "border-red-500" : "border-gray-300"
+              {...register("first_name")}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.first_name ? "border-red-500" : "border-gray-300"
                 }`}
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            {errors.first_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.first_name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Last Name</label>
+            <input
+              type="text"
+              {...register("last_name")}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.last_name ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+            {errors.last_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>
             )}
           </div>
 

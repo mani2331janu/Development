@@ -29,6 +29,11 @@ router.post("/employee/update/:id", importHandler("image", "employee", [
   { name: "experience_certificate", maxCount: 1 },
 ]), EmployeeController.Update)
 router.get("/employee/view/:id",EmployeeController.View)
+router.put("/employee/statusChange/:id",EmployeeController.StatusChange)
+router.put("/employee/delete/:id",EmployeeController.employeeDelete)
+router.post("/employee/filterData",EmployeeController.filterData)
+
+
 
 
 module.exports = router;
