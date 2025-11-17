@@ -20,3 +20,26 @@ export const ROLE = {
   NORMAL_USER: 2,
   SUPERVISOR: 3,
 };
+
+export const Gendder = {
+  MALE: 1,
+  FEMALE: 2,
+  OTHERS: 3,
+};
+
+export const BLOdOD_GROUP = {
+  A_POS: 1,
+  A_NEG: 2,
+  B_POS: 3,
+  B_NEG: 4,
+  AB_POS: 5,
+  AB_NEG: 6,
+  O_POS: 7,
+  O_NEG: 8,
+};
+
+export const RtOLE = {
+  SUPER_ADMIN: 1,
+  NORMAL_USER: 2,
+  SUPERVISOR: 3,
+};
