@@ -12,6 +12,10 @@ const employeeSchema = new mongoose.Schema(
     last_name: { type: String, default: null },
     gender: { type: String, default: null },
     blood_group: { type: String, default: null },
+    role: {
+      type: [String],
+      default: [],
+    },
 
     // Contact Info
     email: { type: String, default: null },

@@ -1,32 +1,47 @@
+/* Light theme submenu hover */
 .ps-submenu-content {
-  background: linear-gradient(180deg, #7c3aed 0%, #d946ef 100%) !important;
-  border-radius: 8px !important;
-  left: 12px !important;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(6px); /* subtle glass effect */
 }
 
-.ps-menu-button ps-open {
-  width: 30px;
+.ps-menu-button.ps-open {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
 }
 
+
+/* Dark theme tweaks */
 .dark .ps-submenu-content {
   background: #1f2937 !important;
-  border-radius: 8px !important;
-  left: 12px !important;
 }
 
-.dark .ps-menu-button ps-open {
-  width: 30px;
+.dark .ps-menu-button.ps-open {
   background-color: #374151 !important;
   color: #fbbf24 !important;
-  background: #dde0e4 !important;
 }
 
+/* Required asterisk */
 .required::after {
   content: " *";
   color: red;
 }
-
 .dark .required::after {
-  color: #f3eeee; 
+  color: #f3eeee;
 }
+
+.pro-sidebar .pro-inner-item {
+    color: #000 !important;  /* or a color that contrasts with background */
+}
+
+.pro-sidebar .pro-inner-item:hover {
+    color: #007bff !important; /* hover color */
+}
+
+.pro-sidebar .pro-menu .pro-sub-menu {
+    background-color: #fff; /* ensure submenu background is visible */
+}
+
+
+
+
 

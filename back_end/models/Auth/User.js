@@ -6,6 +6,10 @@ const userSchema = new mongoose.Schema({
   last_name: { type: String, trim: true },
   email: { type: String, unique: true, lowercase: true },
   password: { type: String },
+  role: {
+      type: [String],
+      default: [],
+    },
 }, { timestamps: true });
 
 // Hash password before saving

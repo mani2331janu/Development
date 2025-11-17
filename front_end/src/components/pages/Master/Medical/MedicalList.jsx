@@ -222,7 +222,7 @@ const MedicalList = () => {
         </>
       ),
     },
-    { name: "Created By", selector: (row) => row.created_by?.name },
+    { name: "Created By", selector: (row) => row.created_by?.first_name },
     { name: "Created At", selector: (row) => new Date(row.createdAt).toLocaleDateString() },
   ];
 
@@ -237,7 +237,7 @@ const MedicalList = () => {
       "Location Name": row.location_id?.location_name,
       "Medical name": row.medical_name,
       "Status": displayStatus(row.status),
-      "Created By" : row.created_by?.name,
+      "Created By" : row.created_by?.first_name,
       "Created At":  displayDateFormat(row.createdAt),
     }));
 
@@ -262,7 +262,7 @@ const MedicalList = () => {
       row.location_id?.location_name,
       row.medical_name,
       displayStatus(row.status),
-      row.created_by?.name,
+      row.created_by?.first_name,
       displayDateFormat(row.createdAt)
     ]);
 

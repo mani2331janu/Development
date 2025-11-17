@@ -8,7 +8,7 @@ const MedicalList = async (req, res) => {
       })
       .populate({
         path: "created_by",
-        select:"name"
+        select:"first_name"
       })
       .select("medical_name status createdAt created_by")
 
@@ -72,8 +72,9 @@ const viewMedicalList = async (req, res) => {
       })
       .populate({
         path: "created_by",
-        select: "name",
+        select: "first_name",
       })
+      
 
     return res.status(200).json({ success: true, data })
 

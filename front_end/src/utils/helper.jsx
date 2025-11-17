@@ -1,7 +1,7 @@
 import React from "react";
 // utils/formatDate.js
 import dayjs from "dayjs";
-import { BLOOD_GROUP, Gender } from "../constant/constant";
+import { BLOOD_GROUP, Gender, ROLE } from "../constant/constant";
 
 export const displayDateFormat = (date) => {
     return date ? dayjs(date).format("DD-MM-YYYY") : "";
@@ -82,6 +82,20 @@ export const getGender = (value) => {
             return "Female";
         case Gender.OTHERS:
             return "Others";
+        default:
+            return "-";
+    }
+}
+
+export const getRoleName = (value) => {
+    value = Number(value);
+    switch (value) {
+        case ROLE.SUPER_ADMIN:
+            return "Super Admin";
+        case ROLE.NORMAL_USER:
+            return "Normal User";
+        case ROLE.SUPERVISOR:
+            return "Supervisor"
         default:
             return "-";
     }

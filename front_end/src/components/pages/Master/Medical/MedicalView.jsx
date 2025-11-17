@@ -52,7 +52,7 @@ const MedicalView = () => {
 
                  <div>
                     <label className="block text-black-900 dark:text-white font-bold text-l mb-2">Created By</label>
-                    <p className="text-gray-800 dark:text-white">{locationData.created_by?.name}</p>
+                    <p className="text-gray-800 dark:text-white">{locationData.created_by?.first_name}</p>
                 </div>
 
                  <div>

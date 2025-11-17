@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import api from "../../../../utils/api";
 import Select from "react-select";
 import { notifySuccess } from "../../../../utils/notify";
-import { BLOOD_GROUP, Gender } from "../../../../constant/constant";
+import { BLOOD_GROUP, Gender, ROLE } from "../../../../constant/constant";
 
 const EmployeeEdit = () => {
   const { id } = useParams();
@@ -38,11 +38,19 @@ const EmployeeEdit = () => {
     { value: BLOOD_GROUP.O_NEG, label: "O-" },
   ];
 
+  const roles = [
+    { value: ROLE.SUPER_ADMIN, label: "Super Admin" },
+    { value: ROLE.NORMAL_USER, label: "Normal User" },
+    { value: ROLE.SUPERVISOR, label: "Supervisor" },
+  ];
+
   const schema = Yup.object().shape({
     first_name: Yup.string().required("First Name is required"),
     last_name: Yup.string().required("last Name is required"),
     gender: Yup.object().required("Gender is required"),
     blood_group: Yup.object().required("Blood group is required"),
+    role: Yup.array().min(1, "Role is required").required("Role is required"),
+
     mobile_no: Yup.string()
       .matches(/^[0-9]{10}$/, "Enter valid 10-digit mobile number")
       .required("Mobile number is required"),
@@ -136,42 +144,52 @@ const EmployeeEdit = () => {
         `${api_url}api/administration/employee/edit/${id}`
       );
       const employee = res.data;
-      console.log(employee);
-
 
       const selectedGender = genderOption.find(
         (opt) => opt.value === Number(employee.gender)
       );
       const selectedBloodGroup = bloodGroupOption.find(
         (opt) => opt.value === Number(employee.blood_group)
-      )
+      );
+
+      const selectedRoles =
+        employee.role && Array.isArray(employee.role)
+          ? roles.filter((opt) =>
+              employee.role.map((r) => Number(r)).includes(opt.value)
+            )
+          : [];
 
       if (employee.profile_image) {
         setPreviews((pre) => ({
           ...pre,
-          profile_image: employee.profile_image
-        }))
+          profile_image: employee.profile_image,
+        }));
       }
       if (employee.id_proof) {
         setPreviews((pre) => ({
           ...pre,
-          id_proof: employee.id_proof
-        }))
+          id_proof: employee.id_proof,
+        }));
       }
       if (employee.degree_certificate) {
         setPreviews((pre) => ({
           ...pre,
-          degree_certificate: employee.degree_certificate
-        }))
+          degree_certificate: employee.degree_certificate,
+        }));
       }
       if (employee.experience_certificate) {
         setPreviews((pre) => ({
           ...pre,
-          experience_certificate: employee.experience_certificate
-        }))
+          experience_certificate: employee.experience_certificate,
+        }));
       }
 
-      reset({ ...employee, gender: selectedGender, blood_group: selectedBloodGroup });
+      reset({
+        ...employee,
+        gender: selectedGender,
+        blood_group: selectedBloodGroup,
+        role: selectedRoles,
+      });
     } catch (err) {
       console.error("Error fetching employee:", err);
     }
@@ -207,6 +225,9 @@ const EmployeeEdit = () => {
           formData.append(key, data[key]?.value || "");
         } else if (key === "blood_group") {
           formData.append(key, data[key]?.value || "");
+        } else if (key === "role") {
+          const roleValues = data.role ? data.role.map((r) => r.value) : [];
+          formData.append("role", JSON.stringify(roleValues));
         } else if (data[key] instanceof FileList) {
           if (data[key][0]) formData.append(key, data[key][0]);
         } else {
@@ -221,7 +242,7 @@ const EmployeeEdit = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      notifySuccess(res.data.message)
+      notifySuccess(res.data.message);
       navigate(-1);
     } catch (err) {
       console.error("Update error:", err);
@@ -229,7 +250,6 @@ const EmployeeEdit = () => {
       setLoading(false);
     }
   };
-
 
   return (
     <div>
@@ -401,6 +421,34 @@ const EmployeeEdit = () => {
                   className="w-[400px] h-[400px] rounded-lg"
                 />
               </div>
+            )}
+          </div>
+
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
+              Role
+            </label>
+            <Controller
+              name="role"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  isMulti
+                  options={roles}
+                  value={field.value}
+                  onChange={(selected) => field.onChange(selected)}
+                  placeholder="Select Roles"
+                  hideSelectedOptions={false}
+                  closeMenuOnSelect={false}
+                />
+              )}
+            />
+
+            {errors.role && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.role.message}
+              </p>
             )}
           </div>
 
@@ -767,8 +815,6 @@ const EmployeeEdit = () => {
               </div>
             )}
           </div>
-
-
         </div>
 
         <hr className="mt-4 border-gray-400 dark:border-gray-600" />
