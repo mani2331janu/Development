@@ -71,7 +71,7 @@ const UploadLogView = () => {
                 <div>
                     <label className="block text-black-900 dark:text-white font-semibold text-l  mb-2">Created By</label>
                     <p className="text-gray-800 dark:text-white">
-                        {log.created_by?.name || "-"}
+                        {log.created_by?.first_name || "-"}
                     </p>
                 </div>
 

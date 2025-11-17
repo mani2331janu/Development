@@ -4,10 +4,12 @@ const User = require("../../models/Auth/User");
 const agenda = require("../../config/agenda");
 const models = { Employee };
 const fs = require("fs");
-const { normalizePath } = require("../../utils/helper");
+const { normalizePath, getUserRoleId, getUserLoginId } = require("../../utils/helper");
 const path = require("path");
 const mongoose = require("mongoose");
 const { updateNextSequence } = require("../../utils/counterHelper");
+const Notification = require("../../models/Administration/Notification");
+const { NotificationType, ROLE } = require("../../config/constant");
 
 const list = async (req, res) => {
   try {
@@ -17,7 +19,6 @@ const list = async (req, res) => {
         select: "first_name",
       })
       .sort({ _id: -1 });
-    console.log(data);
 
     return res.status(200).json(data);
   } catch (error) {
@@ -27,10 +28,15 @@ const list = async (req, res) => {
 };
 
 const Store = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const user_id = req.user?.id || null;
     const nextSeq = await updateNextSequence("employee");
     const employeeId = `EMP-${String(nextSeq).padStart(5, "0")}`;
+
+    const roles = req.body.role ? JSON.parse(req.body.role) : [];
 
     // Generate temporary password
     const namePart = req.body.first_name
@@ -40,53 +46,92 @@ const Store = async (req, res) => {
       1000 + Math.random() * 9000
     )}`;
 
-    // Create User first
-    const user = await User.create({
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      email: req.body.email,
-      password: tempPassword,
-    });
+    // Create User in DB
+    const user = await User.create(
+      [
+        {
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
+          email: req.body.email,
+          password: tempPassword,
+          role: roles,
+        },
+      ],
+      { session }
+    );
 
-    // File uploads
+    // Upload files (if present)
     const profile_image = req.files?.profile_image
       ? `/uploads/employee/${req.files.profile_image[0].filename}`
       : null;
+
     const id_proof = req.files?.id_proof
       ? `/uploads/employee/${req.files.id_proof[0].filename}`
       : null;
+
     const degree_certificate = req.files?.degree_certificate
       ? `/uploads/employee/${req.files.degree_certificate[0].filename}`
       : null;
+
     const experience_certificate = req.files?.experience_certificate
       ? `/uploads/employee/${req.files.experience_certificate[0].filename}`
       : null;
 
-    // Create Employee with login_id from User
-    const data = await Employee.create({
-      login_id: user._id,
-      employee_id: employeeId,
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      gender: req.body.gender,
-      blood_group: req.body.blood_group,
-      email: req.body.email,
-      mobile_no: req.body.mobile_no,
-      emg_mobile_no: req.body.emg_mobile_no,
-      address: req.body.address,
-      city: req.body.city,
-      pincode: req.body.pincode,
-      bank_name: req.body.bank_name,
-      account_number: req.body.account_number,
-      ifsc_code: req.body.ifsc_code,
-      profile_image,
-      id_proof,
-      degree_certificate,
-      experience_certificate,
-      created_by: user_id,
-    });
+    // Create Employee record
+    const employee = await Employee.create(
+      [
+        {
+          login_id: user[0]._id,
+          employee_id: employeeId,
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
+          gender: req.body.gender,
+          blood_group: req.body.blood_group,
+          email: req.body.email,
+          mobile_no: req.body.mobile_no,
+          emg_mobile_no: req.body.emg_mobile_no,
+          address: req.body.address,
+          city: req.body.city,
+          pincode: req.body.pincode,
+          bank_name: req.body.bank_name,
+          account_number: req.body.account_number,
+          ifsc_code: req.body.ifsc_code,
+          profile_image,
+          id_proof,
+          degree_certificate,
+          experience_certificate,
+          created_by: user_id,
+          role: roles,
+        },
+      ],
+      { session }
+    );
 
-    // Send email
+    // Get all SUPER ADMIN user IDs
+    const superAdminIds = await getUserRoleId(ROLE.SUPER_ADMIN);
+
+    // Collect users to notify (admins + creator), ensure uniqueness
+    const assignedUsers = new Set(superAdminIds);
+    assignedUsers.add(user_id);
+
+    // Build notification objects
+    const notifications = [...assignedUsers].map((receiverId) => ({
+      notification_type: NotificationType.EMPLOYEE_MANAGEMENT,
+      message: `New Employee created: ${req.body.first_name} ${req.body.last_name}`,
+      web_link: `employee/view/${employee[0]._id}`,
+      assigned_user: receiverId,
+      status: "unread",
+      created_by: user_id,
+    }));
+
+    // Insert notifications
+    await Notification.insertMany(notifications, { session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // Email is OUTSIDE transaction
     await agenda.now("sendEmployeeEmail", {
       email: req.body.email,
       subject: "Your Employee Login Credentials",
@@ -105,13 +150,18 @@ const Store = async (req, res) => {
 
     res.status(200).json({
       message: "Employee created successfully",
-      data,
+      data: employee[0],
     });
+
   } catch (error) {
-    console.log("❌ Error saving employee:", error);
-    res.status(500).json({ message: "Server Error" });
+    await session.abortTransaction();
+    session.endSession();
+    console.error("❌ Error saving employee:", error);
+    res.status(500).json({ message: "Server Error", error });
   }
 };
+
+
 
 const Edit = async (req, res) => {
   try {
@@ -145,6 +195,7 @@ const Update = async (req, res) => {
   try {
     const { id } = req.params;
     const user_id = req.user?.id || null;
+    const getLoginId = await getUserLoginId(id)
 
     // Parse normal fields
     const {
@@ -198,6 +249,7 @@ const Update = async (req, res) => {
     if (uploadedFiles.experience_certificate)
       deleteOldFile(employee.experience_certificate);
 
+
     // UPDATE EMPLOYEE RECORD
     const updatedData = await Employee.findByIdAndUpdate(
       id,
@@ -231,12 +283,17 @@ const Update = async (req, res) => {
 
         experience_certificate: normalizePath(
           uploadedFiles.experience_certificate ||
-            employee.experience_certificate
+          employee.experience_certificate
         ),
 
         updated_by: user_id,
         updatedAt: new Date(),
       },
+      { new: true }
+    );
+    const userData = await User.findByIdAndUpdate(
+      getLoginId,
+      { role: role },
       { new: true }
     );
 
@@ -374,7 +431,6 @@ const filterData = async (req, res) => {
 const checkEmailUnique = async (req, res) => {
   try {
     const { model, field, value, id } = req.body;
-    console.log(model);
 
     if (!model || !field || !value) {
       return res.status(400).json({ message: "Missing required fields" });

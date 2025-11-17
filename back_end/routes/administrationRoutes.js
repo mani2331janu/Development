@@ -4,6 +4,7 @@ const { importHandler } = require("../middleware/authMiddleware");
 
 const UploadLogController = require("../controllers/Administration/UploadLogController");
 const EmployeeController = require("../controllers/Administration/EmployeeController");
+const Notification = require("../controllers/Administration/NotificationController");
 
 router.get("/uploadlog/list", UploadLogController.uploadLogList);
 router.get("/uploadlog/view/:id", UploadLogController.getUploadLogView);
@@ -32,6 +33,11 @@ router.get("/employee/view/:id",EmployeeController.View)
 router.put("/employee/statusChange/:id",EmployeeController.StatusChange)
 router.put("/employee/delete/:id",EmployeeController.employeeDelete)
 router.post("/employee/filterData",EmployeeController.filterData)
+
+// Notification
+router.get("/notification/list",Notification.List)
+router.post("/notification/updateRead/:id",Notification.updateReadCount)
+
 
 
 

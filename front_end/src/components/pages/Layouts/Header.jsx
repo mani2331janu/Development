@@ -4,6 +4,7 @@ import { Menu as MenuIcon, Sun, Moon } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { useTheme } from "../../../context/ThemeContext";
 import { notifySuccess } from '../../../utils/notify';
+import NotificationBell from "./NotificationBell";
 
 const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
           onClick={onToggleSidebar}
           aria-label="Toggle sidebar"
         >
-          <MenuIcon size={20} color={theme == "dark" ? "#e5e7eb" : "#1f2937"}/>
+          <MenuIcon size={20} color={theme == "dark" ? "#e5e7eb" : "#1f2937"} />
         </button>
         <span className="text-xl font-bold text-gray-800 dark:text-gray-200 transition-colors duration-300">
           Medi Track
@@ -57,6 +58,7 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
           {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
         </button>
 
+        <NotificationBell />
         {/* User Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
@@ -71,10 +73,11 @@ const Header = ({ sidebarWidth = 250, onToggleSidebar }) => {
             </span>
           </button>
 
+
           {open && (
             <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
               <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                <li 
+                <li
                   onClick={handleProfile}
                   className="font-bold bg-gray-200 m-2 dark:text-black rounded py-2 hover:bg-gray-300 hover:text-black dark:hover:text-white text-center dark:hover:bg-gray-700 cursor-pointer transition-colors duration-300"
                 >

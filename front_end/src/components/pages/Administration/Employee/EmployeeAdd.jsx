@@ -9,7 +9,7 @@ import Select from "react-select";
 import api from "../../../../utils/api";
 import { notifySuccess } from "../../../../utils/notify";
 import { useEffect } from "react";
-import { BLOOD_GROUP, Gender } from "../../../../constant/constant";
+import { BLOOD_GROUP, Gender, ROLE } from "../../../../constant/constant";
 
 const EmployeeAdd = () => {
   const api_url = import.meta.env.VITE_API_URL;
@@ -43,6 +43,12 @@ const EmployeeAdd = () => {
     { value: BLOOD_GROUP.O_NEG, label: "O-" },
   ];
 
+  const roles = [
+    { value: ROLE.SUPER_ADMIN, label: "Super Admin" },
+    { value: ROLE.NORMAL_USER, label: "Normal User" },
+    { value: ROLE.SUPERVISOR, label: "Supervisor" },
+  ];
+
 
   const defaultValues = {
     first_name: "",
@@ -69,6 +75,7 @@ const EmployeeAdd = () => {
     first_name: Yup.string().required("First Name is required"),
     last_name: Yup.string().required("last Name is required"),
     gender: Yup.object().required("Gender is required"),
+    role: Yup.array().min(1, "Role is required").required("Role is required"),
     blood_group: Yup.object().required("Blood group is required"),
     mobile_no: Yup.string()
       .matches(/^[0-9]{10}$/, "Enter valid 10-digit mobile number")
@@ -162,8 +169,6 @@ const EmployeeAdd = () => {
   // ✅ Submit handler
   const onSubmit = async (data) => {
     try {
-      console.log(data);
-
       setLoading(true);
       const formData = new FormData();
 
@@ -182,6 +187,10 @@ const EmployeeAdd = () => {
       formData.append("account_number", data.account_number);
       formData.append("ifsc_code", data.ifsc_code);
 
+      if (data.role) {
+        const roleValues = data.role.map((r) => r.value);
+        formData.append("role", JSON.stringify(roleValues));
+      }
       if (data.profile_image?.[0])
         formData.append("profile_image", data.profile_image[0]);
       if (data.id_proof?.[0]) formData.append("id_proof", data.id_proof[0]);
@@ -205,8 +214,11 @@ const EmployeeAdd = () => {
       navigate(-1);
     } catch (error) {
       console.error("❌ Error uploading employee:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   // ✅ File Change Handler
   const handleFileChange = (e, fieldName) => {
@@ -400,6 +412,34 @@ const EmployeeAdd = () => {
                   className="h-16 w-16 object-cover rounded border dark:border-white"
                 />
               </div>
+            )}
+          </div>
+          {/* role */}
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
+              Role
+            </label>
+            <Controller
+              name="role"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  isMulti
+                  options={roles}
+                  value={field.value}
+                  onChange={(selected) => field.onChange(selected)}
+                  placeholder="Select Roles"
+                  hideSelectedOptions={false}
+                  closeMenuOnSelect={false}
+                />
+              )}
+            />
+
+            {errors.role && (
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {errors.role.message}
+              </p>
             )}
           </div>
           <div className="w-full font-bold text-white mt-3 px-4 py-2 rounded-md bg-blue-700 dark:bg-gray-600 border border-blue-800 dark:border-gray-700 shadow-sm">
