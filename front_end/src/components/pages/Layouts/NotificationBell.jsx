@@ -2,10 +2,12 @@ import React, { useEffect, useState, useRef } from "react";
 import { FiBell } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import api from "../../../utils/api";
+import io from "socket.io-client";
 
 const NotificationBell = () => {
     const api_url = import.meta.env.VITE_API_URL
     const app_url = import.meta.env.VITE_APP_URL
+    const socket = io(import.meta.env.VITE_API_URL);
 
     const [openNotification, setOpenNotification] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -17,7 +19,7 @@ const NotificationBell = () => {
         try {
             const res = await api.get(`${api_url}api/administration/notification/list`);
             console.log(1);
-            
+
             setNotifications(res.data)
         } catch (err) {
             console.log(err);
@@ -28,11 +30,16 @@ const NotificationBell = () => {
         // initial fetch
         fetchNotificationDate();
 
-        // const intervalId = setInterval(() => {
-        //     fetchNotificationDate();
-        // }, 1000); // 1000 ms = 1 second
+        socket.on("new-notification", (notification) => {
+            console.log("🔔 New notification:", notification);
 
-        // return () => clearInterval(intervalId); // cleanup on unmount
+            setNotifications((prev) => [notification, ...prev]);
+        });
+
+        return () => {
+            socket.off("new-notification");
+        };
+
     }, []);
 
     // Click outside to close dropdown

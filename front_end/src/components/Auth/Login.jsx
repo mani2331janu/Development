@@ -8,6 +8,7 @@ import LoginImage from '../../assets/student_portal.jpg'; // make sure to includ
 import axios from 'axios'
 import { useAuth } from "../../context/AuthContext";
 import { notifySuccess } from '../../utils/notify';
+import { getFcmToken } from "../../firebaseConfig";
 
 const Login = () => {
   const api_url = import.meta.env.VITE_API_URL
@@ -34,6 +35,14 @@ const Login = () => {
       const res = await axios.post(`${api_url}api/auth/log_in`, data);
       login(res.data.token, res.data.user);
       notifySuccess(res.data.message || "Login successfully!");
+      const fcmToken = await getFcmToken();
+
+      if (fcmToken) {
+        await axios.post(`${api_url}api/auth/push/store-token`, {
+          user_id: res.data.user.id,
+          fcm_token: fcmToken,
+        });
+      }
       navigate("/");
     } catch (err) {
       const message =

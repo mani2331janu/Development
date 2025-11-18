@@ -42,7 +42,7 @@ const EmployeeView = () => {
           Employee Details
         </h2>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/administration/employee/list")}
           className="px-3 text-white py-1 bg-blue-500 rounded transition-transform duration-400 hover:scale-110 hover:bg-blue-700"
         >
           Back

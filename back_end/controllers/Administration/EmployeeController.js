@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const { updateNextSequence } = require("../../utils/counterHelper");
 const Notification = require("../../models/Administration/Notification");
 const { NotificationType, ROLE } = require("../../config/constant");
+const { sendFcmNotificationToUsers } = require("../../utils/notifyUser");
 
 const list = async (req, res) => {
   try {
@@ -27,11 +28,13 @@ const list = async (req, res) => {
   }
 };
 
+
 const Store = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
+    const io = req.app.get("io");
     const user_id = req.user?.id || null;
     const nextSeq = await updateNextSequence("employee");
     const employeeId = `EMP-${String(nextSeq).padStart(5, "0")}`;
@@ -118,7 +121,7 @@ const Store = async (req, res) => {
     const notifications = [...assignedUsers].map((receiverId) => ({
       notification_type: NotificationType.EMPLOYEE_MANAGEMENT,
       message: `New Employee created: ${req.body.first_name} ${req.body.last_name}`,
-      web_link: `employee/view/${employee[0]._id}`,
+      web_link: `administration/employee/view/${employee[0]._id}`,
       assigned_user: receiverId,
       status: "unread",
       created_by: user_id,
@@ -126,6 +129,16 @@ const Store = async (req, res) => {
 
     // Insert notifications
     await Notification.insertMany(notifications, { session });
+
+    notifications.forEach((notif) => {
+      io.emit("new-notification", notif);
+    });
+
+    await sendFcmNotificationToUsers(
+      [...assignedUsers], // user IDs
+      "New Employee Created 🎉",
+      `Employee ${req.body.first_name} ${req.body.last_name} has been added`
+    );
 
     // Commit transaction
     await session.commitTransaction();
