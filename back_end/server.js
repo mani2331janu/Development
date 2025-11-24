@@ -32,7 +32,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/master", authMiddleware, masterRoute);
+app.use("/api/master", authMiddleware, masterRoute);  
 app.use("/api/administration", authMiddleware, adminRoute);
 
 // Setup socket connection

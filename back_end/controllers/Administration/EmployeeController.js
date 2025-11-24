@@ -4,13 +4,17 @@ const User = require("../../models/Auth/User");
 const agenda = require("../../config/agenda");
 const models = { Employee };
 const fs = require("fs");
-const { normalizePath, getUserRoleId, getUserLoginId } = require("../../utils/helper");
+const {
+  normalizePath,
+  getUserRoleId,
+  getUserLoginId,
+} = require("../../utils/helper");
 const path = require("path");
 const mongoose = require("mongoose");
 const { updateNextSequence } = require("../../utils/counterHelper");
 const Notification = require("../../models/Administration/Notification");
 const { NotificationType, ROLE } = require("../../config/constant");
-const { sendFcmNotificationToUsers } = require("../../utils/notifyUser");
+// const { sendFcmNotificationToUsers } = require("../../utils/notifyUser");
 
 const list = async (req, res) => {
   try {
@@ -28,11 +32,7 @@ const list = async (req, res) => {
   }
 };
 
-
 const Store = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const io = req.app.get("io");
     const user_id = req.user?.id || null;
@@ -41,7 +41,6 @@ const Store = async (req, res) => {
 
     const roles = req.body.role ? JSON.parse(req.body.role) : [];
 
-    // Generate temporary password
     const namePart = req.body.first_name
       ? req.body.first_name.substring(0, 4)
       : "User";
@@ -49,21 +48,14 @@ const Store = async (req, res) => {
       1000 + Math.random() * 9000
     )}`;
 
-    // Create User in DB
-    const user = await User.create(
-      [
-        {
-          first_name: req.body.first_name,
-          last_name: req.body.last_name,
-          email: req.body.email,
-          password: tempPassword,
-          role: roles,
-        },
-      ],
-      { session }
-    );
+    const user = await User.create({
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      email: req.body.email,
+      password: tempPassword,
+      role: roles,
+    });
 
-    // Upload files (if present)
     const profile_image = req.files?.profile_image
       ? `/uploads/employee/${req.files.profile_image[0].filename}`
       : null;
@@ -80,101 +72,66 @@ const Store = async (req, res) => {
       ? `/uploads/employee/${req.files.experience_certificate[0].filename}`
       : null;
 
-    // Create Employee record
-    const employee = await Employee.create(
-      [
-        {
-          login_id: user[0]._id,
-          employee_id: employeeId,
-          first_name: req.body.first_name,
-          last_name: req.body.last_name,
-          gender: req.body.gender,
-          blood_group: req.body.blood_group,
-          email: req.body.email,
-          mobile_no: req.body.mobile_no,
-          emg_mobile_no: req.body.emg_mobile_no,
-          address: req.body.address,
-          city: req.body.city,
-          pincode: req.body.pincode,
-          bank_name: req.body.bank_name,
-          account_number: req.body.account_number,
-          ifsc_code: req.body.ifsc_code,
-          profile_image,
-          id_proof,
-          degree_certificate,
-          experience_certificate,
-          created_by: user_id,
-          role: roles,
-        },
-      ],
-      { session }
-    );
+    const employee = await Employee.create({
+      login_id: user._id,
+      employee_id: employeeId,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      gender: req.body.gender,
+      blood_group: req.body.blood_group,
+      email: req.body.email,
+      mobile_no: req.body.mobile_no,
+      emg_mobile_no: req.body.emg_mobile_no,
+      address: req.body.address,
+      city: req.body.city,
+      pincode: req.body.pincode,
+      bank_name: req.body.bank_name,
+      account_number: req.body.account_number,
+      ifsc_code: req.body.ifsc_code,
+      profile_image,
+      id_proof,
+      degree_certificate,
+      experience_certificate,
+      created_by: user_id,
+      role: roles,
+    });
 
-    // Get all SUPER ADMIN user IDs
     const superAdminIds = await getUserRoleId(ROLE.SUPER_ADMIN);
 
-    // Collect users to notify (admins + creator), ensure uniqueness
-    const assignedUsers = new Set(superAdminIds);
-    assignedUsers.add(user_id);
+     const assignedUsers = new Set(superAdminIds);
+    // assignedUsers.add(user_id);
 
-    // Build notification objects
     const notifications = [...assignedUsers].map((receiverId) => ({
       notification_type: NotificationType.EMPLOYEE_MANAGEMENT,
       message: `New Employee created: ${req.body.first_name} ${req.body.last_name}`,
-      web_link: `administration/employee/view/${employee[0]._id}`,
+      web_link: `administration/employee/view/${employee._id}`,
       assigned_user: receiverId,
       status: "unread",
       created_by: user_id,
     }));
 
-    // Insert notifications
-    await Notification.insertMany(notifications, { session });
+    await Notification.insertMany(notifications);
 
     notifications.forEach((notif) => {
       io.emit("new-notification", notif);
     });
 
-    await sendFcmNotificationToUsers(
-      [...assignedUsers], // user IDs
-      "New Employee Created 🎉",
-      `Employee ${req.body.first_name} ${req.body.last_name} has been added`
-    );
-
-    // Commit transaction
-    await session.commitTransaction();
-    session.endSession();
-
-    // Email is OUTSIDE transaction
+    // Send email
     await agenda.now("sendEmployeeEmail", {
       email: req.body.email,
       subject: "Your Employee Login Credentials",
-      html: `
-        <h3>Welcome to the Company!</h3>
-        <p>Dear ${req.body.first_name},</p>
-        <p>Your employee account has been successfully created.</p>
-        <p><b>Employee ID:</b> ${employeeId}</p>
-        <p><b>Login Username:</b> ${req.body.email}</p>
-        <p><b>Temporary Password:</b> ${tempPassword}</p>
-        <p>Please log in and change your password after first login.</p>
-        <br/>
-        <p>Regards,<br/>HR Team</p>
-      `,
+      html: `<h3>Welcome</h3> ...`,
     });
 
     res.status(200).json({
       message: "Employee created successfully",
-      data: employee[0],
+      data: employee,
     });
-
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
     console.error("❌ Error saving employee:", error);
     res.status(500).json({ message: "Server Error", error });
   }
 };
-
-
 
 const Edit = async (req, res) => {
   try {
@@ -208,7 +165,7 @@ const Update = async (req, res) => {
   try {
     const { id } = req.params;
     const user_id = req.user?.id || null;
-    const getLoginId = await getUserLoginId(id)
+    const getLoginId = await getUserLoginId(id);
 
     // Parse normal fields
     const {
@@ -262,7 +219,6 @@ const Update = async (req, res) => {
     if (uploadedFiles.experience_certificate)
       deleteOldFile(employee.experience_certificate);
 
-
     // UPDATE EMPLOYEE RECORD
     const updatedData = await Employee.findByIdAndUpdate(
       id,
@@ -296,7 +252,7 @@ const Update = async (req, res) => {
 
         experience_certificate: normalizePath(
           uploadedFiles.experience_certificate ||
-          employee.experience_certificate
+            employee.experience_certificate
         ),
 
         updated_by: user_id,
@@ -380,19 +336,15 @@ const StatusChange = async (req, res) => {
     const data = await Employee.updateOne({ _id: id }, { $set: { status } });
 
     if (data.modifiedCount > 0) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Employee  Status Changed Successfully",
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Employee  Status Changed Successfully",
+      });
     } else {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Medical not found or status already set",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Medical not found or status already set",
+      });
     }
   } catch (error) {
     console.log(error);
@@ -414,12 +366,10 @@ const employeeDelete = async (req, res) => {
         .status(200)
         .json({ success: true, message: "Employee Data Delete Successfully" });
     } else {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Employee not found or status already set",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found or status already set",
+      });
     }
   } catch (err) {
     console.log(err);
@@ -467,6 +417,17 @@ const checkEmailUnique = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// const getProfileData = async (req, res) => {
+//   try {
+//     const user_id = req.user.id;
+//     console.log(user_id);
+
+//   } catch (err) {
+//     console.error("Unique check error:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 
 module.exports = {
   list,

@@ -33,6 +33,8 @@ router.get("/employee/view/:id",EmployeeController.View)
 router.put("/employee/statusChange/:id",EmployeeController.StatusChange)
 router.put("/employee/delete/:id",EmployeeController.employeeDelete)
 router.post("/employee/filterData",EmployeeController.filterData)
+// router.get("/get-profile-data",EmployeeController.getProfileData)
+
 
 // Notification
 router.get("/notification/list",Notification.List)
