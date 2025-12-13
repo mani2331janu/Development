@@ -94,6 +94,15 @@ const EmployeeView = () => {
 
         <div>
           <label className="block text-black-900 dark:text-white font-bold text-l mb-2">
+            Date of Birth
+          </label>
+          <p className="text-gray-800 dark:text-white">
+            {displayDateFormat(employee.dob)}
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-black-900 dark:text-white font-bold text-l mb-2">
             Profile Image
           </label>
           <img

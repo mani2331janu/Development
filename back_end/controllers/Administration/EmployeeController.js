@@ -94,11 +94,12 @@ const Store = async (req, res) => {
       experience_certificate,
       created_by: user_id,
       role: roles,
+      dob: req.body.dob,
     });
 
     const superAdminIds = await getUserRoleId(ROLE.SUPER_ADMIN);
 
-     const assignedUsers = new Set(superAdminIds);
+    const assignedUsers = new Set(superAdminIds);
     // assignedUsers.add(user_id);
 
     const notifications = [...assignedUsers].map((receiverId) => ({
@@ -182,6 +183,7 @@ const Update = async (req, res) => {
       city,
       pincode,
       emg_mobile_no,
+      dob,
     } = req.body;
 
     // ✅ Parse Roles (from FormData JSON string)
@@ -236,6 +238,7 @@ const Update = async (req, res) => {
         city,
         pincode,
         emg_mobile_no,
+        dob,
 
         // ✅ Save MULTIPLE ROLES here
         role: role,
@@ -418,16 +421,64 @@ const checkEmailUnique = async (req, res) => {
   }
 };
 
-// const getProfileData = async (req, res) => {
-//   try {
-//     const user_id = req.user.id;
-//     console.log(user_id);
+const getProfileData = async (req, res) => {
+  try {
+    const base_url = `${req.protocol}://${req.host}`;
 
-//   } catch (err) {
-//     console.error("Unique check error:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
+    const user_id = req.user.id;
+    const data = await Employee.findOne({ login_id: user_id });
+    if (data.profile_image) {
+      data.profile_image = `${base_url}${data.profile_image}`;
+    }
+    return res.status(200).json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateProfileImage = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const employee = await Employee.findOne({ login_id: user_id });
+    const newImage = req.importedFiles?.profile_image;
+
+    if (!newImage) {
+      return res.status(400).json({ message: "No Image Upload" });
+    }
+
+    // Delete old image if exists
+    if (employee?.profile_image) {
+      const old_path = employee.profile_image.replace(/^\//, "");
+      const old_file_path = path.join(process.cwd(), old_path);
+
+      if (fs.existsSync(old_file_path)) {
+        fs.unlinkSync(old_file_path);
+      }
+    }
+
+    // Update new image in DB
+    const updateData = {
+      profile_image: newImage, // e.g. "/uploads/employee/xxxx.png"
+      updated_at: new Date()
+    };
+
+    const result = await Employee.updateOne(
+      { login_id: user_id },   // ← filter condition
+      { $set: updateData }     // ← data to update
+    );
+
+    return res.status(200).json({
+      message: "Profile image updated successfully",
+      updated: result
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 module.exports = {
   list,
@@ -440,4 +491,6 @@ module.exports = {
   StatusChange,
   employeeDelete,
   filterData,
+  getProfileData,
+  updateProfileImage,
 };

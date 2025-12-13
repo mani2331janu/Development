@@ -20,7 +20,6 @@ const NotificationBell = () => {
       const res = await api.get(
         `${api_url}api/administration/notification/list`
       );
-      console.log(1);
 
       setNotifications(res.data);
     } catch (err) {
@@ -58,7 +57,6 @@ const NotificationBell = () => {
 
   // Handle click on notification
   const handleNotificationClick = async (notification) => {
-    console.log(notification);
 
     navigate("/" + notification.web_link);
     await api.post(

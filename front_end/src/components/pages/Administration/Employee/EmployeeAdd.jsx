@@ -25,7 +25,6 @@ const EmployeeAdd = () => {
   const [employeeId, setEmployeeId] = useState("");
   const [loading, setLoading] = useState(false);
 
-
   const genderOption = [
     { value: Gender.MALE, label: "Male" },
     { value: Gender.FEMALE, label: "Female" },
@@ -48,7 +47,6 @@ const EmployeeAdd = () => {
     { value: ROLE.NORMAL_USER, label: "Normal User" },
     { value: ROLE.SUPERVISOR, label: "Supervisor" },
   ];
-
 
   const defaultValues = {
     first_name: "",
@@ -151,6 +149,10 @@ const EmployeeAdd = () => {
           ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
         );
       }),
+    dob: Yup.date()
+      .nullable()
+      .required("Date of birth is required")
+      .max(new Date(), "DOB cannot be in the future"),
   });
 
   const {
@@ -169,8 +171,14 @@ const EmployeeAdd = () => {
   // ✅ Submit handler
   const onSubmit = async (data) => {
     try {
+
       setLoading(true);
       const formData = new FormData();
+      const dobFormatted = data.dob
+        ? new Date(data.dob).toISOString().split("T")[0]
+        : null;
+
+      formData.append("dob", dobFormatted);
 
       formData.append("first_name", data.first_name);
       formData.append("last_name", data.last_name);
@@ -218,7 +226,6 @@ const EmployeeAdd = () => {
       setLoading(false);
     }
   };
-
 
   // ✅ File Change Handler
   const handleFileChange = (e, fieldName) => {
@@ -379,6 +386,35 @@ const EmployeeAdd = () => {
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                 {errors.blood_group.message}
               </p>
+            )}
+          </div>
+
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
+              Date of Birth
+            </label>
+
+            <Controller
+              name="dob"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  maxDate={new Date()}
+                  placeholderText="Select Date of Birth"
+                  dateFormat="dd-MM-yyyy"
+                  className="border border-gray-400 dark:border-gray-600 
+                   bg-white dark:bg-gray-800 
+                   text-gray-900 dark:text-gray-200
+                   rounded w-full p-2 
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              )}
+            />
+
+            {errors.dob && (
+              <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
             )}
           </div>
 

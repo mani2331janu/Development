@@ -7,6 +7,9 @@ import api from "../../../../utils/api";
 import Select from "react-select";
 import { notifySuccess } from "../../../../utils/notify";
 import { BLOOD_GROUP, Gender, ROLE } from "../../../../constant/constant";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const EmployeeEdit = () => {
   const { id } = useParams();
@@ -144,6 +147,7 @@ const EmployeeEdit = () => {
         `${api_url}api/administration/employee/edit/${id}`
       );
       const employee = res.data;
+      console.log(employee);
 
       const selectedGender = genderOption.find(
         (opt) => opt.value === Number(employee.gender)
@@ -189,6 +193,7 @@ const EmployeeEdit = () => {
         gender: selectedGender,
         blood_group: selectedBloodGroup,
         role: selectedRoles,
+        dob: employee.dob ? new Date(employee.dob) : null,
       });
     } catch (err) {
       console.error("Error fetching employee:", err);
@@ -375,6 +380,35 @@ const EmployeeEdit = () => {
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                 {errors.blood_group.message}
               </p>
+            )}
+          </div>
+
+          <div className="w-full sm:w-1/2 lg:w-1/3 mt-3 px-2">
+            <label className="required block text-gray-700 dark:text-white font-medium mb-2">
+              Date of Birth
+            </label>
+
+            <Controller
+              name="dob"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  maxDate={new Date()}
+                  placeholderText="Select Date of Birth"
+                  dateFormat="dd-MM-yyyy"
+                  className="border border-gray-400 dark:border-gray-600 
+                   bg-white dark:bg-gray-800 
+                   text-gray-900 dark:text-gray-200
+                   rounded w-full p-2 
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              )}
+            />
+
+            {errors.dob && (
+              <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
             )}
           </div>
 
